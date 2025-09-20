@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>지인회 (志人會) - 전주 태권도 선수팀 연합</title>
+    <meta name="description" content="전주를 대표하는 태권도 선수팀 연합 지인회입니다. 체계적인 훈련 철학과 설립 이념, 회원 명단 및 도장 목록을 확인하세요.">
+    <meta name="keywords" content="지인회, 태권도, 전주 태권도, 태권도 선수, 태권도장, Taekwondo, Jeonju">
+    <meta property="og:title" content="지인회 (志人會) - 전주 태권도 선수팀 연합">
+    <meta property="og:description" content="전주를 대표하는 태권도 선수팀 연합. 설립 이념, 회원 명단, 활동 사진 등을 확인하세요.">
+    <meta property="og:image" content="img/og-image.jpg"> 
+    <meta property="og:url" content="https://YOUR_WEBSITE_URL.com">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="img/favicon.ico/apple-icon-180x180.png">
+    
+    <link rel="icon" type="image/png" href="img/favicon.ico/apple-icon.png">
+
+    <link rel="manifest" href="img/favicon.ico/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="img/favicon.ico/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #faf9f7;
+            --paper-texture: #f5f3f0;
+            --door-color: #1a1a1a;
+            --text-on-dark: #e0d6c7;
+            --main-text-color: #2d2d2d;
+            --accent-red: #a63232;
+            --accent-gold: #b8860b;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --traditional-blue: #1e3a8a;
+            --soft-shadow: rgba(0, 0, 0, 0.05);
+        }
+
+        html { 
+            scroll-behavior: smooth; 
+        }
+        
+        body { 
+            background: linear-gradient(135deg, var(--bg-color) 0%, var(--paper-texture) 100%);
+            background-attachment: fixed;
+            color: var(--main-text-color); 
+            font-family: 'Noto Sans KR', sans-serif; 
+            font-weight: 400;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        section[id] { 
+            scroll-margin-top: 80px; 
+        }
+        
+        .font-serif-display { 
+            font-family: 'Noto Serif KR', serif; 
+        }
+        
+        .traditional-pattern {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .traditional-pattern::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(166, 50, 50, 0.1) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, rgba(30, 58, 138, 0.1) 2px, transparent 2px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            pointer-events: none;
+        }
+        
+        #splash-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh; 
+            overflow: hidden; z-index: 100; 
+        }
+        #splash-screen.inactive { pointer-events: none; }
+        
+        .door { 
+            position: absolute; top: 0; width: 50.5%; height: 100%; 
+            background: linear-gradient(45deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            transition: transform 1.5s cubic-bezier(0.8, 0, 0.2, 1); 
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.8); 
+        }
+        #left-door { left: 0; }
+        #right-door { right: 0; }
+        #left-door.open { transform: translateX(-100%); }
+        #right-door.open { transform: translateX(100%); }
+        
+        #hanja-title { 
+            position: absolute; top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            color: var(--text-on-dark); 
+            font-size: clamp(4rem, 15vw, 12rem); 
+            transition: opacity 1s ease-out, transform 1s ease-out; 
+            pointer-events: none;
+            text-shadow: 0 0 30px rgba(224, 214, 199, 0.5);
+        }
+        #hanja-title.fade-out { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+        
+        main { 
+            opacity: 0; 
+            transition: opacity 1.2s ease-in-out; 
+            transition-delay: 0.5s; 
+        }
+        main.visible { opacity: 1; }
+
+        #hero { 
+            height: 80vh; 
+            background-size: cover; 
+            background-position: center; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            position: relative;
+        }
+        
+        #hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(
+                135deg, 
+                rgba(166, 50, 50, 0.3) 0%, 
+                rgba(0, 0, 0, 0.5) 50%, 
+                rgba(30, 58, 138, 0.3) 100%
+            );
+            z-index: 1;
+        }
+        
+        #hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-image: var(--next-bg-image);
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+            z-index: 0;
+        }
+        
+        #hero.fade-in::after {
+            opacity: 1;
+        }
+
+        #hero > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes expandWidth {
+            from { width: 0; }
+            to { width: 80px; }
+        }
+
+        #hero h2 {
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            color: #ffffff; 
+            text-shadow: 
+                0 0 8px rgba(166, 50, 50, 0.7),
+                0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        #hero p {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: #f0f0f0; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        .hero-content-visible .slogan-line,
+        .hero-content-visible .slogan-divider,
+        .hero-content-visible .slogan-subtitle {
+            opacity: 0; 
+            animation-fill-mode: forwards;
+        }
+
+        .hero-content-visible .slogan-line {
+            animation-name: fadeInUp;
+            animation-duration: 1s;
+            animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .hero-content-visible .slogan-line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .hero-content-visible .slogan-divider {
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            animation-name: expandWidth;
+            animation-duration: 0.8s;
+            animation-delay: 0.5s;
+            animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .hero-content-visible .slogan-subtitle {
+            animation-name: fadeInUp;
+            animation-duration: 1s;
+            animation-delay: 0.8s;
+            animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .section-divider {
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-red) 50%, transparent 100%);
+            margin: 4rem 0;
+            position: relative;
+        }
+        
+        .section-divider::before,
+        .section-divider::after {
+            content: '◆';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-red);
+            font-size: 1rem;
+            background: var(--bg-color);
+            padding: 0 1rem;
+        }
+        
+        .section-divider::before {
+            left: 25%;
+        }
+        
+        .section-divider::after {
+            right: 25%;
+        }
+
+        .content-section {
+            margin: 5rem 0;
+            position: relative;
+        }
+        
+        .elegant-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 243, 240, 0.8) 100%);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 0;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .elegant-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-red) 0%, var(--accent-gold) 50%, var(--traditional-blue) 100%);
+        }
+
+        .intro-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 4rem;
+            align-items: center;
+            padding: 4rem;
+        }
+        
+        .logo-container {
+            position: relative;
+            text-align: center;
+        }
+        
+        .philosophy-text {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: #4a4a4a;
+        }
+        
+        .philosophy-text .highlight {
+            color: var(--accent-red);
+            font-weight: 600;
+            position: relative;
+        }
+
+                .awards-list {
+            padding-top: 2rem;
+            min-height: 300px;
+        }
+        
+        .award-item {
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .award-item:first-child {
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .award-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .award-year {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            min-width: 100px;
+            flex-shrink: 0;
+        }
+        
+        .award-content {
+            flex-grow: 1;
+        }
+        
+        .award-content h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .award-results {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .award-result {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.5;
+            padding-left: 1rem;
+            position: relative;
+        }
+        
+        .award-result::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-red);
+            font-weight: bold;
+        }
+        .members-container {
+            padding: 3rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .members-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .member-row {
+            display: block;
+            padding: 1.5rem 2.5rem;
+            border-bottom: 1px solid rgba(166, 50, 50, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            background: transparent;
+        }
+        
+        .member-row:hover {
+            background: linear-gradient(135deg, rgba(166, 50, 50, 0.03) 0%, rgba(30, 58, 138, 0.03) 100%);
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            z-index: 10;
+        }
+        
+        .member-row::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--accent-red) 0%, var(--traditional-blue) 100%);
+            transform: scaleY(0);
+            transition: transform 0.4s ease;
+            transform-origin: center;
+        }
+        
+        .member-row:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .member-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .member-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--main-text-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .member-role {
+            color: #666;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        
+        .honorary-badge {
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #d4af37 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .member-row:first-child {
+            border-top: 1px solid rgba(166, 50, 50, 0.1);
+        }
+        
+        .member-row.honorary {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        .gallery-container {
+            padding: 2rem;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(166, 50, 50, 0.8) 0%, rgba(30, 58, 138, 0.8) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        
+        .gallery-overlay p {
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .dojangs-section {
+            padding: 3rem 2rem;
+        }
+        
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--main-text-color);
+            padding: 0.75rem 2rem;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--accent-red);
+            transform: translateY(-2px);
+        }
+        
+        .filter-btn.active {
+            background: var(--accent-red);
+            color: white;
+            box-shadow: 0 4px 16px rgba(166, 50, 50, 0.3);
+        }
+        
+        .dojang-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .dojang-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .dojang-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-red) 0%, var(--accent-gold) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .dojang-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .dojang-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dojang-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--main-text-color);
+        }
+        
+        .dojang-region {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .intro-section {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 2rem;
+            }
+            
+            .members-container {
+                padding: 2rem 0.5rem;
+            }
+            
+            .member-row {
+                padding: 1.5rem 1rem;
+            }
+            
+            .member-name {
+                font-size: 1.2rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .award-item {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+            
+            .award-year {
+                margin-right: 0;
+                margin-bottom: 0.75rem;
+                min-width: 0;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="navbar" class="bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-sm transition-opacity duration-500 opacity-0 border-b border-gray-200/80">
+        <div class="container mx-auto max-w-7xl px-6 py-3 flex justify-between items-center">
+            <a href="#" class="h-12 transition-transform duration-300 hover:scale-105">
+                <img src="img/logo_title.png" alt="지인회 로고" class="h-full w-auto">
+            </a>
+            <nav class="hidden md:flex space-x-8 items-center text-base font-medium">
+                <a href="#about" class="text-gray-700 hover:text-red-800 transition duration-300">소개</a>
+                <a href="#awards" class="text-gray-700 hover:text-red-800 transition duration-300">수상내역</a>
+                <a href="#players" class="text-gray-700 hover:text-red-800 transition duration-300">회원명단</a>
+                <a href="#gallery" class="text-gray-700 hover:text-red-800 transition duration-300">활동사진</a>
+                <a href="#dojangs" class="text-gray-700 hover:text-red-800 transition duration-300">도장목록</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden p-2 rounded-md hover:bg-gray-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 border-t border-gray-200/80">
+            <a href="#about" class="block py-2 text-gray-700 hover:text-red-800">소개</a>
+            <a href="#awards" class="block py-2 text-gray-700 hover:text-red-800">수상내역</a>
+            <a href="#players" class="block py-2 text-gray-700 hover:text-red-800">회원명단</a>
+            <a href="#gallery" class="block py-2 text-gray-700 hover:text-red-800">활동사진</a>
+            <a href="#dojangs" class="block py-2 text-gray-700 hover:text-red-800">도장목록</a>
+        </div>
+    </header>
+
+    <div id="splash-screen">
+        <div id="left-door" class="door"></div>
+        <div id="right-door" class="door"></div>
+        <h1 id="hanja-title" class="font-serif-display">志人會</h1>
+    </div>
+
+    <main id="main-content">
+        <section id="hero">
+            <div id="hero-content">
+                <h2 class="font-serif-display font-bold tracking-tight leading-tight">
+                    <span class="slogan-line block">정신을 잇고,</span>
+                    <span class="slogan-line block">기술을 연마하다</span>
+                </h2>
+                <div class="slogan-divider mx-auto my-6"></div>
+                <p class="slogan-subtitle max-w-3xl leading-relaxed">
+                    지인회는 태권도의 올곧은 정신을 계승하고, 세계 최고를 향해 나아가는 선수들의 연합입니다.
+                </p>
+            </div>
+        </section>
+
+        <div class="container mx-auto max-w-7xl px-6">
+            <section id="about" class="content-section traditional-pattern">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-serif-display font-bold mb-4">지인회 소개</h2>
+                    <div class="section-divider"></div>
+                </div>
+                
+                <div class="elegant-card">
+                    <div class="intro-section">
+                        <div class="logo-container">
+                            <img src="img/logo2.png" alt="지인회 로고" class="rounded-lg max-w-sm w-full mx-auto">
+                        </div>
+                        <div class="philosophy-text">
+                            <h3 class="text-3xl font-bold font-serif-display mb-6 text-red-800">지인회의 정신</h3>
+                            <p>'<span class="highlight">뜻을 가진 이들의 모임</span>'이라는 이름처럼, 우리는 예를 바탕으로 한 상호 존중 위에서 개인의 기량을 꽃피웁니다. 기술의 완벽함만을 추구하지 않으며, <span class="highlight">땀방울 속에서 인내를 배우고, 상대에 대한 존중 속에서 자신을 이기는 극기 정신을 기릅니다.</span> 개인의 승리보다 공동체의 발전을, 경쟁보다 협력을 중시하는 것이 지인회만의 특별함입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="awards" class="content-section">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-serif-display font-bold mb-4">주요 수상 내역</h2>
+                    <div class="section-divider"></div>
+                </div>
+                <div class="elegant-card">
+                    <div class="p-6 md:p-8">
+                        <div class="filter-container" id="awards-filter-container">
+                            <button class="filter-btn active" data-filter="2025">2025년</button>
+                            <button class="filter-btn" data-filter="2024">2024년</button>
+                            <button class="filter-btn" data-filter="2023">2023년</button>
+                            <button class="filter-btn" data-filter="2022">2022년</button>
+                            <button class="filter-btn" data-filter="2021">2021년</button>
+                            <button class="filter-btn" data-filter="2020">2020년</button>
+                            <button class="filter-btn" data-filter="all">전체</button>
+                        </div>
+                        <div class="awards-list" id="awards-list-content">
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="players" class="content-section traditional-pattern">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-serif-display font-bold mb-4">회원 명단</h2>
+                    <div class="section-divider"></div>
+                </div>
+                
+                <div class="elegant-card">
+                    <div class="members-container">
+                        <div class="members-list">
+                            <div class="member-row honorary">
+                                <div class="member-info">
+                                    <div class="member-name">정인수 <span class="honorary-badge">명예회원</span></div>
+                                    <div class="member-role">지인회태권도 관장</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">김민화</div>
+                                    <div class="member-role">용인대마스터태권도 관장</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">박미선</div>
+                                    <div class="member-role">군산시 장애인체육회</div>
+                                </div>
+                            </div>
+                            <div class="member-row honorary">
+                                <div class="member-info">
+                                    <div class="member-name">김동현 <span class="honorary-badge">명예회원</span></div>
+                                    <div class="member-role">리더스태권도 관장</div>
+                                </div>
+                            </div>
+                            <div class="member-row honorary">
+                                <div class="member-info">
+                                    <div class="member-name">여형일 <span class="honorary-badge">명예회원</span></div>
+                                    <div class="member-role">우석대학교 교수</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">김수일</div>
+                                    <div class="member-role">원광대학교</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">장명진</div>
+                                    <div class="member-role">프리랜서 지도자, 팀어게인 전주점</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">이진규</div>
+                                    <div class="member-role">평화 효자태권도장 관장</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">조광익</div>
+                                    <div class="member-role">히어로키즈태권도장 관장</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">김선</div>
+                                    <div class="member-role">정읍시 체육회</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">이동혁</div>
+                                    <div class="member-role">삼례경희대태권도장</div>
+                                </div>
+                            </div>
+                            <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">조명성</div>
+                                    <div class="member-role">태양태권도 관장</div>
+                                </div>
+                            </div>
+                             <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">김찬율</div>
+                                    <div class="member-role">찬빛태권도장</div>
+                                </div>
+                            </div>
+                             <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">유향미</div>
+                                    <div class="member-role">탑클래스태권도장</div>
+                                </div>
+                            </div>
+                             <div class="member-row">
+                                <div class="member-info">
+                                    <div class="member-name">변동아</div>
+                                    <div class="member-role">송천 효경석사 태권도</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="gallery" class="content-section">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-serif-display font-bold mb-4">활동 사진</h2>
+                    <div class="section-divider"></div>
+                </div>
+                
+                <div class="elegant-card">
+                    <div class="gallery-container">
+                        <div class="gallery-grid">
+                            <div class="gallery-item">
+                                <img src="img/train1.jpg" alt="정기수련">
+                                <div class="gallery-overlay"><p>정기수련</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/01.jpg" alt="입회식">
+                                <div class="gallery-overlay"><p>입회식</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/train2.jpg" alt="주말 훈련">
+                                <div class="gallery-overlay"><p>주말 훈련</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/train3.jpg" alt="대회">
+                                <div class="gallery-overlay"><p>대회</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/05.jpg" alt="정기수련">
+                                <div class="gallery-overlay"><p>정기수련</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/06.jpg" alt="정기수련">
+                                <div class="gallery-overlay"><p>정기수련</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dojangs" class="content-section traditional-pattern">
+                <div class="text-center mb-16">
+                    <h2 class="text-5xl font-serif-display font-bold mb-4">지인회 소속 도장</h2>
+                    <div class="section-divider"></div>
+                </div>
+                
+                <div class="elegant-card">
+                    <div class="dojangs-section">
+                        <div class="filter-container" id="dojangs-filter-container">
+                            <button class="filter-btn active" data-filter="all">전체</button>
+                            <button class="filter-btn" data-filter="전주시">전주시</button>
+                            <button class="filter-btn" data-filter="군산시">군산시</button>
+                            <button class="filter-btn" data-filter="완주군">완주군</button>
+                            <button class="filter-btn" data-filter="진안군">진안군</button>
+                        </div>
+                        <div class="dojang-grid" id="dojang-list"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 py-16 traditional-pattern" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
+        <div class="container mx-auto max-w-7xl px-6 text-center">
+            <div class="mb-8">
+                <h5 class="font-serif-display text-3xl text-white mb-4">지인회 (志人會)</h5>
+                <div class="w-24 h-1 bg-gradient-to-r from-red-600 to-blue-600 mx-auto mb-6"></div>
+            </div>
+            <div class="text-lg space-y-2">
+                <p>전북특별자치도 전주시 <br> 문의 : 0507-1448-7577(용인대마스터태권도)</p>
+                <p class="text-gray-500 mt-8">&copy; 2025 JI-IN-HOE Taekwondo Union. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            const leftDoor = document.getElementById('left-door');
+            const rightDoor = document.getElementById('right-door');
+            const hanjaTitle = document.getElementById('hanja-title');
+            const mainContent = document.getElementById('main-content');
+            const navbar = document.getElementById('navbar');
+            
+            let isSplashOpen = false;
+
+            function openDoors() {
+                if (isSplashOpen) return;
+                isSplashOpen = true;
+
+                splashScreen.classList.add('inactive');
+                leftDoor.classList.add('open');
+                rightDoor.classList.add('open');
+                hanjaTitle.classList.add('fade-out');
+                mainContent.classList.add('visible');
+                navbar.classList.remove('opacity-0');
+
+                document.getElementById('hero').classList.add('hero-content-visible');
+
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 1600);
+            }
+
+            window.addEventListener('scroll', openDoors, { once: true });
+            window.addEventListener('wheel', openDoors, { once: true });
+            window.addEventListener('touchstart', openDoors, { once: true });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target.tagName === 'A') {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+            
+            const heroImages = ['img/01.jpg', 'img/02.jpg', 'img/03.jpg', 'img/04.jpg', 'img/05.jpg', 'img/06.jpg'];
+            const heroSection = document.getElementById('hero');
+            if (heroImages.length > 1) {
+                heroImages.forEach(src => { (new Image()).src = src; });
+                
+                let currentImageIndex = 0;
+                heroSection.style.backgroundImage = `url('${heroImages[0]}')`;
+
+                setInterval(() => {
+                    currentImageIndex = (currentImageIndex + 1) % heroImages.length;
+                    const newImageUrl = `url('${heroImages[currentImageIndex]}')`;
+
+                    heroSection.style.setProperty('--next-bg-image', newImageUrl);
+                    heroSection.classList.add('fade-in');
+
+                    setTimeout(() => {
+                        heroSection.style.backgroundImage = newImageUrl;
+                        heroSection.classList.remove('fade-in');
+                    }, 1500);
+
+                }, 5000);
+            }
+
+            // 수상 내역 데이터 및 필터 기능
+            const awardsData = [
+                { year: 2025, date: '8월 8일', name: '제60회 대통령기 전국단체대항태권도대회', results: ['🥇 태백 2부 여 1위: 장명진', '🥈 금강 2부 여 2위: 유향미', '🥉 천권부 남 3위: 이진규'] },
+                { year: 2025, date: '7월 19일', name: '계명대 총장기 대회', results: ['🥇 태백2부 여자 1위: 장명진', '🥉 장년1부 복식전 3위: 이홍원, 장명진'] },
+                { year: 2025, date: '7월 19일', name: '제18회 세계태권도 엑스포대회', results: ['🥇 개인전 1위: 이진규'] },
+                { year: 2025, date: '7월 5일', name: '제23회 우석대 총장기 전국태권도 대회', results: ['🥇 천권부 여 1위: 김민화', '🥈 천권부 남 2위: 이진규', '🥈 천권부 여 2위: 박미선'] },
+                { year: 2025, date: '6월 15일', name: '제23회 한국여성태권도연맹회장기 전국태권도대회', results: ['🥈 금강 2부 여 2위: 유향미', '🥉 천권부 남 3위: 이진규'] },
+                { year: 2025, date: '5월 4일', name: '제3회 전주대총장기 전국태권도대회', results: ['🥇 태백 2부 여 1위: 장명진', '🥇 천권부 여 1위: 김민화', '🥉 천권부 남 3위: 이진규'] },
+                { year: 2025, date: '7월 26일', name: '제11회 태권도원배 전국태권도선수권대회', results: ['🥉 천권부 여자 3위: 박미선'] },
+                { year: 2024, date: '12월 2일', name: '2024년 홍콩품새선수권대회', results: ['🥈 은메달: 장명진 (여 단체전, +30세 이상)'] },
+                { year: 2024, date: '8월 5일', name: '2024년 세계태권도선수권대회 최종전', results: ['🥈 2위: 장명진 (-40세 이하)', '🥉 3위: 장명진 (+30세 이상 통합단체전, 국가대표 발탁)'] },
+                { year: 2024, date: '7월 20일', name: '2024년 제17회 무주태권도원 문화엑스포대회', results: ['🥈 2위: 유향미 (개인전 2부, 시니어1)', '🥉 3위: 조명성, 이동혁 (개인전 1부, 시니어2)'] },
+                { year: 2024, date: '5월 26일', name: '제21회 계명대학교총장기 태권도대회', results: ['🥉 3위: 이동혁, 김민화 (페어전, 장년부)'] },
+                { year: 2024, date: '5월 12-14일', name: '제8회 아시아 품새선수권대회', results: ['🥇 1위: 장명진 (페어전, +30세 이상)'] },
+                { year: 2024, date: '5월 14일', name: '2024년 전북특별자치도 태권도한마당대회', results: ['🥇 1위: 이동혁 (개인전, 태백부)', '🥈 2위: 조명성 (개인전, 태백부)', '🏅 시도대항 감투상: 조명성, 조광익'] },
+                { year: 2024, date: '3월 30일', name: '제18회 한국실업태권도연맹회장기', results: ['🥇 1위: 장명진 (개인전, 태백1부)', '🥉 3위: 김동현, 장명진 (페어전, 장년부)'] },
+                { year: 2024, date: '2월 24일', name: '2024년 아시아 선수권대회 선발전', results: ['🥈 2위: 장명진 (-40세 이하, 페어전 국가대표 발탁)', '🥉 3위: 김민화 (-50세 이하)'] },
+                { year: 2024, date: '2월 23일', name: '2024년 세계선수권대회 선발전', results: ['🥇 1위: 장명진 (-40세 이하)', '🥉 3위: 김민화 (-50세 이하)'] },
+                { year: 2024, date: '2월 3일', name: '제19회 제주평화기 전국태권도대회', results: ['🥇 1위: 김동현 (지태2부)'] },
+                { year: 2023, date: '11월 27일', name: '제20회 대한태권도협회장배 전국태권도품새선수권대회', results: ['🥇 지태 2부 여 1위: 박미선', '🥈 태백 1부 여 2위: 장명진', '🥉 지태 2부 남 3위: 김동현', '🥉 지태 2부 여 3위: 김민화'] },
+                { year: 2023, date: '8월 6일', name: '2023년 우석대총장기 태권도대회', results: ['🥈 지태 2부 2위: 박미선', '🥉 지태 2부 3위: 김민화'] },
+                { year: 2023, date: '8월 2일', name: '2023 김운용컵 국제오픈 태권도대회', results: ['🥈 -50 여자 2위: 박미선', '🥉 -50 남자 3위: 김동현'] },
+                { year: 2023, date: '7월 16일', name: '여성연맹 태권도대회', results: ['🥈 지태2부 2위: 이진규', '🥉 지태 1부 3위: 김선'] },
+                { year: 2023, date: '6월 3-4일', name: '제14회 나사렛대학교총장기대회', results: ['🥇 지태 2부 남 1위: 김동현', '🥇 태백 1부 여 1위: 장명진', '🥈 지태 2부 남 2위: 이진규', '🥈 페어 장년부 2위: 김동현, 김민화', '🥉 페어 장년부 3위: 이진규, 박미선'] },
+                { year: 2023, date: '5월 14일', name: '아시아태평양마스터즈대회', results: ['🥇 -50 남 개인전 1위: 김동현', '🥇 -40 여 개인전 1위: 장명진', '🥇 -50 여 개인전 1위: 박미선', '🥇 +30이상 페어전 1위: 김동현, 장명진', '🥇 +30이상 남 단체전 1위: 김동현, 이진규, 이현재', '🥇 +30이상 여 단체전 1위: 김민화, 박미선, 장명진', '🥈 -45 여 개인전 2위: 김선', '🥈 -50 여 개인전 2위: 김민화', '🥉 -50 남 개인전 3위: 이진규', '🥉 +30이상 페어전 3위: 이진규, 박미선'] },
+                { year: 2023, date: '5월 7일', name: '제1회 전주대총장기 대회', results: ['🥉 지태 1부 3위: 김선'] },
+                { year: 2023, date: '', name: '성남한마당대회', results: ['🥈 시니어3 2위: 김동현'] },
+                { year: 2023, date: '', name: '제35회 도지사배 태권도대회 겸 전국체전 선발전', results: ['🥉 -30 3위: 김수일 (전라북도 대표 선발)'] },
+                { year: 2023, date: '', name: '한마당대회 및 전국체전 2차 선발전', results: ['🥉 -30 3위: 김수일'] },
+                { year: 2022, date: '2월 12일', name: '2022 국가대표선발전', results: ['🥉 지태2부 3위: 김민화'] },
+                { year: 2022, date: '2월 8일', name: '제19회 대한태권도협회 품새선수권대회', results: ['🥈 여자 지태2부 2위: 김민화', '🥉 태백1부 3위: 장명진', '🥉 남자 지태2부 3위: 김동현'] },
+                { year: 2022, date: '', name: '제2회 신한대학교 총장기 전국태권도대회', results: ['🥇 개인전 지태2부 1위: 김민화', '🥈 개인전 지태2부 2위: 김동현', '🥈 개인전 지태2부 2위: 박미선', '🥉 복식전 3위: 지인회A (박미선, 이진규)', '🥉 복식전 3위: 지인회B (김민화, 김동현)'] },
+                { year: 2021, date: '11월 27일', name: '제16회 전주비전대학교총장배 태권도대회', results: ['🥇 개인전 1부 1위: 장명진', '🥇 개인전 1부 1위: 김수일', '🥇 개인전 2부 1위: 이진규', '🥈 단체전 2위 (장명진, 김수일, 이진규)'] },
+                { year: 2021, date: '6월 19일', name: '제18회 대한태권도협회장배 품새선수권대회', results: ['🥇 여자 지태2부 1위: 김민화', '🥈 여자 지태2부 2위: 박미선', '🥈 남자 지태2부 2위: 김동현'] },
+                { year: 2020, date: '7월 22일', name: '제13회 세계태권도문화엑스포', results: ['🥉 단체전 3위 (김민화, 박미선, 김동현)'] }
+            ];
+
+            const awardsListContainer = document.getElementById('awards-list-content');
+            const awardsFilterButtons = document.querySelectorAll('#awards-filter-container .filter-btn');
+
+            const renderAwards = (awards) => {
+                awardsListContainer.innerHTML = '';
+                if (awards.length === 0) {
+                    awardsListContainer.innerHTML = `<p class="text-gray-500 text-center text-lg py-8">해당 연도의 수상 내역이 없습니다.</p>`;
+                    return;
+                }
+                const currentFilter = document.querySelector('#awards-filter-container .active').dataset.filter;
+                awards.forEach(award => {
+                    const resultsHTML = award.results.map(result => `<li>${result}</li>`).join('');
+                    const awardItem = document.createElement('div');
+                    awardItem.className = 'award-item';
+                    
+                    const yearDisplay = (currentFilter === 'all' || !award.date) ? award.year + '년' : award.date;
+
+                    awardItem.innerHTML = `
+                        <div class="award-year">${yearDisplay}</div>
+                        <div class="award-content">
+                            <h4>${award.name}</h4>
+                            ${resultsHTML ? `<ul>${resultsHTML}</ul>` : ''}
+                        </div>
+                    `;
+                    awardsListContainer.appendChild(awardItem);
+                });
+            };
+
+            awardsFilterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    awardsFilterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const filter = button.dataset.filter;
+                    const filteredAwards = (filter === 'all') ? awardsData : awardsData.filter(award => award.year == filter);
+                    renderAwards(filteredAwards);
+                });
+            });
+
+            const initialFilteredAwards = awardsData.filter(award => award.year === 2025);
+            renderAwards(initialFilteredAwards);
+
+            // 도장 목록 데이터 및 렌더링
+            const dojangsData = [
+                { name: '리더스태권도', region: '전주시', mapLink: 'https://naver.me/GFB5sriI' }, 
+                { name: '삼례경희대태권도장', region: '완주군', mapLink: 'https://naver.me/xDJdm8kY' },
+                { name: '송천 효경석사 태권도', region: '전주시', mapLink: 'https://naver.me/GlJBEbJL' }, 
+                { name: '팀 어게인 전주점', region: '전주시', mapLink: 'https://naver.me/xS1QIpVn'},
+                { name: '용인대마스터태권도', region: '전주시', mapLink: 'https://naver.me/5zX5EsYT' }, 
+                { name: '찬빛태권도장', region: '진안군', mapLink: 'https://naver.me/FqWACESi' },
+                { name: '탑클래스태권도장', region: '전주시', mapLink: 'https://naver.me/FMce94en' }, 
+                { name: '태양태권도', region: '군산시', mapLink: 'https://naver.me_G7VmbQgB' },
+                { name: '평화 효자태권도장', region: '전주시', mapLink: 'https://naver.me/FUQyNTtn' }, 
+                { name: '히어로키즈태권도장', region: '군산시', mapLink: 'https://naver.me/xUwPQiXf' }
+            ];
+            
+           
+            const dojangListContainer = document.getElementById('dojang-list');
+            const dojangFilterButtons = document.querySelectorAll('#dojangs-filter-container .filter-btn');
+
+            // 2. 이 함수가 mapLink를 직접 사용합니다.
+            const renderDojangs = (dojangs) => {
+                dojangListContainer.innerHTML = '';
+                if(dojangs.length === 0) {
+                    dojangListContainer.innerHTML = `<p class="col-span-full text-gray-500 text-center text-lg">해당 지역에 등록된 도장이 없습니다.</p>`;
+                    return;
+                }
+                dojangs.forEach(dojang => {
+                    const link = document.createElement('a');
+                    
+                    // mapLink 값을 바로 href로 사용
+                    link.href = dojang.mapLink; 
+                    
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+
+                    const dojangCard = document.createElement('div');
+                    dojangCard.className = 'dojang-card';
+                    dojangCard.innerHTML = `
+                        <div class="dojang-name">${dojang.name}</div>
+                        <div class="dojang-region">${dojang.region}</div>
+                    `;
+
+                    link.appendChild(dojangCard);
+                    dojangListContainer.appendChild(link);
+});
+            };
+
+            dojangFilterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    dojangFilterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    const filter = button.dataset.filter;
+                    const filteredDojangs = (filter === 'all') ? dojangsData : dojangsData.filter(dojang => dojang.region === filter);
+                    filteredDojangs.sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+                    renderDojangs(filteredDojangs);
+                });
+            });
+
+            const initialDojangs = [...dojangsData].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
+            renderDojangs(initialDojangs);
+        });
+    </script>
+</body>
+</html>
