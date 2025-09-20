@@ -290,68 +290,47 @@
             position: relative;
         }
 
-                .awards-list {
+        .awards-list {
             padding-top: 2rem;
             min-height: 300px;
         }
-        
         .award-item {
-            padding: 2rem 0;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .award-item:first-child {
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .award-header {
             display: flex;
             align-items: flex-start;
-            gap: 2rem;
-            margin-bottom: 1rem;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(166, 50, 50, 0.1);
         }
-        
+        .award-item:first-child {
+            border-top: 1px solid rgba(166, 50, 50, 0.1);
+        }
         .award-year {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: var(--accent-red);
+            margin-right: 2.5rem;
             min-width: 100px;
+            text-align: center;
             flex-shrink: 0;
         }
-        
         .award-content {
             flex-grow: 1;
         }
-        
         .award-content h4 {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: 600;
             color: #333;
-            margin-bottom: 1rem;
-            line-height: 1.4;
+            margin-bottom: 0.75rem;
         }
-        
-        .award-results {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .award-result {
-            font-size: 0.95rem;
+        .award-content ul {
+            list-style-type: none;
+            padding-left: 0;
+            font-size: 1rem;
             color: #555;
-            line-height: 1.5;
-            padding-left: 1rem;
-            position: relative;
         }
-        
-        .award-result::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: var(--accent-red);
-            font-weight: bold;
+        .award-content li {
+            margin-bottom: 0.5rem;
         }
+
         .members-container {
             padding: 3rem 2rem;
             max-width: 1000px;
@@ -611,6 +590,20 @@
                 min-width: 0;
                 text-align: left;
             }
+            /* --- [수정] 모바일 화면 최적화를 위한 추가 스타일 --- */
+            .content-section {
+                margin: 3.5rem 0; /* 섹션 간 상하 여백 축소 */
+            }
+            .text-5xl.font-serif-display {
+                font-size: 2.5rem; /* 섹션 제목 글자 크기 조정 */
+            }
+            .filter-btn {
+                padding: 0.6rem 1.25rem; /* 필터 버튼 크기 조정 */
+                font-size: 0.9rem;
+            }
+            .dojang-card {
+                padding: 2rem 1.5rem; /* 도장 카드 내부 여백 조정 */
+            }
         }
     </style>
 </head>
@@ -769,12 +762,6 @@
                             </div>
                             <div class="member-row">
                                 <div class="member-info">
-                                    <div class="member-name">김선</div>
-                                    <div class="member-role">정읍시 체육회</div>
-                                </div>
-                            </div>
-                            <div class="member-row">
-                                <div class="member-info">
                                     <div class="member-name">이동혁</div>
                                     <div class="member-role">삼례경희대태권도장</div>
                                 </div>
@@ -822,24 +809,24 @@
                                 <div class="gallery-overlay"><p>정기수련</p></div>
                             </div>
                             <div class="gallery-item">
+                                <img src="img/train2.jpg" alt="대회 출전">
+                                <div class="gallery-overlay"><p>대회 출전</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/train3.jpg" alt="팀 미팅">
+                                <div class="gallery-overlay"><p>팀 미팅</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/05.jpg" alt="품새 시연">
+                                <div class="gallery-overlay"><p>품새 시연</p></div>
+                            </div>
+                            <div class="gallery-item">
+                                <img src="img/06.jpg" alt="정신 수양">
+                                <div class="gallery-overlay"><p>정신 수양</p></div>
+                            </div>
+                            <div class="gallery-item">
                                 <img src="img/01.jpg" alt="입회식">
                                 <div class="gallery-overlay"><p>입회식</p></div>
-                            </div>
-                            <div class="gallery-item">
-                                <img src="img/train2.jpg" alt="주말 훈련">
-                                <div class="gallery-overlay"><p>주말 훈련</p></div>
-                            </div>
-                            <div class="gallery-item">
-                                <img src="img/train3.jpg" alt="대회">
-                                <div class="gallery-overlay"><p>대회</p></div>
-                            </div>
-                            <div class="gallery-item">
-                                <img src="img/05.jpg" alt="정기수련">
-                                <div class="gallery-overlay"><p>정기수련</p></div>
-                            </div>
-                            <div class="gallery-item">
-                                <img src="img/06.jpg" alt="정기수련">
-                                <div class="gallery-overlay"><p>정기수련</p></div>
                             </div>
                         </div>
                     </div>
@@ -875,7 +862,7 @@
                 <div class="w-24 h-1 bg-gradient-to-r from-red-600 to-blue-600 mx-auto mb-6"></div>
             </div>
             <div class="text-lg space-y-2">
-                <p>전북특별자치도 전주시 <br> 문의 : 0507-1448-7577(용인대마스터태권도)</p>
+                <p>전북특별자치도 전주시 | ji-in-hoe@email.com | 063-xxx-xxxx</p>
                 <p class="text-gray-500 mt-8">&copy; 2025 JI-IN-HOE Taekwondo Union. All Rights Reserved.</p>
             </div>
         </div>
@@ -953,7 +940,7 @@
                 { year: 2025, date: '8월 8일', name: '제60회 대통령기 전국단체대항태권도대회', results: ['🥇 태백 2부 여 1위: 장명진', '🥈 금강 2부 여 2위: 유향미', '🥉 천권부 남 3위: 이진규'] },
                 { year: 2025, date: '7월 19일', name: '계명대 총장기 대회', results: ['🥇 태백2부 여자 1위: 장명진', '🥉 장년1부 복식전 3위: 이홍원, 장명진'] },
                 { year: 2025, date: '7월 19일', name: '제18회 세계태권도 엑스포대회', results: ['🥇 개인전 1위: 이진규'] },
-                { year: 2025, date: '7월 5일', name: '제23회 우석대 총장기 전국태권도 대회', results: ['🥇 천권부 여 1위: 김민화', '🥈 천권부 남 2위: 이진규', '🥈 천권부 여 2위: 박미선'] },
+                { year: 2025, date: '7월 5일', name: '우석대 총장기 전국태권도 대회', results: ['🥇 천권부 여 1위: 김민화', '🥈 천권부 남 2위: 이진규', '🥈 천권부 여 2위: 박미선'] },
                 { year: 2025, date: '6월 15일', name: '제23회 한국여성태권도연맹회장기 전국태권도대회', results: ['🥈 금강 2부 여 2위: 유향미', '🥉 천권부 남 3위: 이진규'] },
                 { year: 2025, date: '5월 4일', name: '제3회 전주대총장기 전국태권도대회', results: ['🥇 태백 2부 여 1위: 장명진', '🥇 천권부 여 1위: 김민화', '🥉 천권부 남 3위: 이진규'] },
                 { year: 2025, date: '7월 26일', name: '제11회 태권도원배 전국태권도선수권대회', results: ['🥉 천권부 여자 3위: 박미선'] },
