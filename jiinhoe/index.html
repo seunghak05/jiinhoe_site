@@ -556,60 +556,75 @@
             font-size: 1rem;
         }
 
+        /* --- 모바일 반응형 스타일 --- */
         @media (max-width: 768px) {
+            #hero {
+                height: 70vh; /* 모바일에서 히어로 섹션 높이를 줄여 이미지 잘림 완화 */
+            }
+            .container.mx-auto {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .content-section {
+                margin: 3.5rem 0;
+            }
+            .text-5xl.font-serif-display {
+                font-size: 2.5rem;
+            }
+            .section-divider::before {
+                left: 10%;
+            }
+            .section-divider::after {
+                right: 10%;
+            }
             .intro-section {
                 grid-template-columns: 1fr;
                 gap: 2rem;
-                padding: 2rem;
+                padding: 2.5rem 1.5rem;
             }
-            
             .members-container {
                 padding: 2rem 0.5rem;
             }
-            
             .member-row {
                 padding: 1.5rem 1rem;
             }
-            
             .member-name {
                 font-size: 1.2rem;
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
             }
-            
             .award-item {
                 flex-direction: column;
                 align-items: flex-start;
                 text-align: left;
             }
-            
             .award-year {
                 margin-right: 0;
                 margin-bottom: 0.75rem;
                 min-width: 0;
                 text-align: left;
             }
-            /* --- [수정] 모바일 화면 최적화를 위한 추가 스타일 --- */
-            .content-section {
-                margin: 3.5rem 0; /* 섹션 간 상하 여백 축소 */
-            }
-            .text-5xl.font-serif-display {
-                font-size: 2.5rem; /* 섹션 제목 글자 크기 조정 */
-            }
             .filter-btn {
-                padding: 0.6rem 1.25rem; /* 필터 버튼 크기 조정 */
+                padding: 0.6rem 1rem;
                 font-size: 0.9rem;
+                gap: 0.5rem;
             }
             .dojang-card {
-                padding: 2rem 1.5rem; /* 도장 카드 내부 여백 조정 */
+                padding: 2rem 1.5rem;
+            }
+            footer .text-lg {
+                font-size: 1rem;
+            }
+            .gallery-grid {
+                gap: 1rem;
             }
         }
     </style>
 </head>
 <body>
     <header id="navbar" class="bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-sm transition-opacity duration-500 opacity-0 border-b border-gray-200/80">
-        <div class="container mx-auto max-w-7xl px-6 py-3 flex justify-between items-center">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 py-3 flex justify-between items-center">
             <a href="#" class="h-12 transition-transform duration-300 hover:scale-105">
                 <img src="img/logo_title.png" alt="지인회 로고" class="h-full w-auto">
             </a>
@@ -626,7 +641,7 @@
                 </svg>
             </button>
         </div>
-        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 border-t border-gray-200/80">
+        <div id="mobile-menu" class="hidden md:hidden px-4 sm:px-6 pb-4 border-t border-gray-200/80">
             <a href="#about" class="block py-2 text-gray-700 hover:text-red-800">소개</a>
             <a href="#awards" class="block py-2 text-gray-700 hover:text-red-800">수상내역</a>
             <a href="#players" class="block py-2 text-gray-700 hover:text-red-800">회원명단</a>
@@ -643,7 +658,7 @@
 
     <main id="main-content">
         <section id="hero">
-            <div id="hero-content">
+            <div id="hero-content" class="px-4">
                 <h2 class="font-serif-display font-bold tracking-tight leading-tight">
                     <span class="slogan-line block">정신을 잇고,</span>
                     <span class="slogan-line block">기술을 연마하다</span>
@@ -655,7 +670,7 @@
             </div>
         </section>
 
-        <div class="container mx-auto max-w-7xl px-6">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6">
             <section id="about" class="content-section traditional-pattern">
                 <div class="text-center mb-16">
                     <h2 class="text-5xl font-serif-display font-bold mb-4">지인회 소개</h2>
@@ -681,7 +696,7 @@
                     <div class="section-divider"></div>
                 </div>
                 <div class="elegant-card">
-                    <div class="p-6 md:p-8">
+                    <div class="p-4 sm:p-6 md:p-8">
                         <div class="filter-container" id="awards-filter-container">
                             <button class="filter-btn active" data-filter="2025">2025년</button>
                             <button class="filter-btn" data-filter="2024">2024년</button>
@@ -862,14 +877,14 @@
     </main>
 
     <footer class="bg-gray-900 text-gray-400 py-16 traditional-pattern" style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
-        <div class="container mx-auto max-w-7xl px-6 text-center">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 text-center">
             <div class="mb-8">
                 <h5 class="font-serif-display text-3xl text-white mb-4">지인회 (志人會)</h5>
                 <div class="w-24 h-1 bg-gradient-to-r from-red-600 to-blue-600 mx-auto mb-6"></div>
             </div>
             <div class="text-lg space-y-2">
                 <p>전북특별자치도 전주시<br>
-                    0507-1448-7577</p>
+                    문의 : 0507-1448-7577(용인대 마스터 태권도)</p>
                 <p class="text-gray-500 mt-8">&copy; 2025 JI-IN-HOE Taekwondo Union. All Rights Reserved.</p>
             </div>
         </div>
@@ -1029,7 +1044,7 @@
                 { name: '용인대마스터태권도', region: '전주시', mapLink: 'https://naver.me/5zX5EsYT' }, 
                 { name: '찬빛태권도장', region: '진안군', mapLink: 'https://naver.me/FqWACESi' },
                 { name: '탑클래스태권도장', region: '전주시', mapLink: 'https://naver.me/FMce94en' }, 
-                { name: '태양태권도', region: '군산시', mapLink: 'https://naver.me_G7VmbQgB' },
+                { name: '태양태권도', region: '군산시', mapLink: 'https://naver.me/G7VmbQgB' },
                 { name: '평화 효자태권도장', region: '전주시', mapLink: 'https://naver.me/FUQyNTtn' }, 
                 { name: '히어로키즈태권도장', region: '군산시', mapLink: 'https://naver.me/xUwPQiXf' }
             ];
@@ -1038,7 +1053,6 @@
             const dojangListContainer = document.getElementById('dojang-list');
             const dojangFilterButtons = document.querySelectorAll('#dojangs-filter-container .filter-btn');
 
-            // 2. 이 함수가 mapLink를 직접 사용합니다.
             const renderDojangs = (dojangs) => {
                 dojangListContainer.innerHTML = '';
                 if(dojangs.length === 0) {
@@ -1047,10 +1061,7 @@
                 }
                 dojangs.forEach(dojang => {
                     const link = document.createElement('a');
-                    
-                    // mapLink 값을 바로 href로 사용
                     link.href = dojang.mapLink; 
-                    
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
 
@@ -1063,7 +1074,7 @@
 
                     link.appendChild(dojangCard);
                     dojangListContainer.appendChild(link);
-});
+                });
             };
 
             dojangFilterButtons.forEach(button => {
