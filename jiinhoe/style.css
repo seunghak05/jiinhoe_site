@@ -352,5 +352,8 @@ footer {
   .ft-brand { font-size:1.8rem; }
   .ft-bottom { flex-direction:column; align-items:flex-start; gap:.5rem; }
   .ft-mark { display:none; }
+  .ft-desc { display:none; }
+  .ft-contact-org { display:none; }
+  .ft-nav-label { display:none; }
   .sec-title { font-size:clamp(1.6rem, 7vw, 2.4rem); }
 }
