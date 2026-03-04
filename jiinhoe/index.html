@@ -108,9 +108,9 @@
 /* 오른쪽 세로 한자 */
 .hero-deco {
   position:absolute; right:4vw; top:50%; transform:translateY(-50%);
-  writing-mode:vertical-rl;
+  display:flex; flex-direction:column; align-items:center; gap:.2em;
   font-family:var(--serif); font-weight:900; font-size:5rem;
-  color:rgba(255,255,255,.03); letter-spacing:.2em;
+  color:rgba(255,255,255,.03);
   user-select:none; pointer-events:none;
 }
 
@@ -346,7 +346,7 @@
 <section id="hero">
   <div class="hero-bg" id="hbg"></div>
   <div class="hero-overlay"></div>
-  <div class="hero-deco">志人會</div>
+  <div class="hero-deco"><span>志</span><span>人</span><span>會</span></div>
   <div class="hero-body" id="hb">
     <div class="hero-eyebrow">
       <div class="hero-eyebrow-line"></div>
