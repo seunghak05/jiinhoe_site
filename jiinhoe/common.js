@@ -23,6 +23,12 @@
     });
   }
 
+  /* 저작권 연도 자동 업데이트 */
+  const ftCopy = document.querySelector('.ft-copy');
+  if (ftCopy) {
+    ftCopy.textContent = '© ' + new Date().getFullYear() + ' 지인회 (志人會). All rights reserved.';
+  }
+
   /* 스크롤 reveal */
   const ro = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {

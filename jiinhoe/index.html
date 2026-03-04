@@ -5,9 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="canonical" href="https://jiinhoe.netlify.app/">
 <title>지인회 (志人會) | 전북특별자치도 태권도 품새팀</title>
-<meta name="description" content="전북 태권도 명문 품새팀 지인회 (志人會)의 공식 홈페이지입니다.">
+<meta name="description" content="전북특별자치도 태권도 품새팀 지인회 (志人會)의 공식 홈페이지입니다.">
 <meta property="og:title" content="지인회 (志人會) | 전북특별자치도 태권도 품새팀">
 <meta property="og:url" content="https://jiinhoe.netlify.app/">
+<meta property="og:description" content="전북특별자치도 태권도 품새팀 지인회 (志人會)의 공식 홈페이지입니다.">
+<meta property="og:image" content="https://jiinhoe.netlify.app/img/train1.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="img/favicon.ico/apple-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -56,7 +60,7 @@
 }
 .sc-hanja {
   font-family:var(--serif); font-weight:900;
-  font-size:7rem; color:#cc3333;
+  font-size:5.2rem; color:#cc3333;
   letter-spacing:.08em; line-height:1;
   white-space:nowrap;
 }
@@ -65,21 +69,10 @@
   font-size:.78rem; color:rgba(248,247,243,.25);
   letter-spacing:.55em;
 }
-.sc-hint {
-  font-family:var(--disp); font-style:italic;
-  font-size:.65rem; color:rgba(248,247,243,.2);
-  letter-spacing:.45em; margin-top:2.5rem;
-  animation:blink 2s ease-in-out infinite;
-}
-@keyframes blink {
-  0%,100%{ opacity:.15; }
-  50%    { opacity:.55; }
-}
 @media(max-width:540px){
   .sc-ring { width:240px; height:240px; }
-  .sc-hanja { font-size:4rem; font-family:var(--serif); font-weight:900; letter-spacing:.08em; }
+  .sc-hanja { font-size:3rem; font-family:var(--serif); font-weight:900; letter-spacing:.08em; }
   .sc-sub { font-size:.68rem; letter-spacing:.3em; }
-  .sc-hint { font-size:.6rem; letter-spacing:.3em; margin-top:1.8rem; }
 }
 
 /* ── HERO ── */
@@ -306,7 +299,6 @@
       <div class="sc-hanja">志人會</div>
     </div>
     <p class="sc-sub">전북 태권도 품새팀</p>
-    <p class="sc-hint">touch to enter</p>
   </div>
 </div>
 
@@ -395,7 +387,7 @@
           <div class="hm-card-num">02</div>
           <p class="hm-card-en">Achievements</p>
           <h3 class="hm-card-kr">수상내역</h3>
-          <p class="hm-card-desc">국내외 대회에서 쌓아온 33회 이상의 수상 기록을 확인하세요.</p>
+          <p class="hm-card-desc">국내외 대회에서 쌓아온 수상 기록을 확인하세요.</p>
           <span class="hm-card-arrow">자세히 보기 <span>→</span></span>
         </div>
       </a>
@@ -447,9 +439,7 @@
         <p class="ft-brand">志人會</p>
         <p class="ft-tagline">전북특별자치도 태권도 품새팀</p>
         <p class="ft-desc">뜻을 가진 이들의 모임, 지인회.<br>정신과 기술을 함께 연마합니다.</p>
-        <p class="ft-contact">문의 · <a href="tel:0507-1448-7577">0507-1448-7577</a></p>
-        <p class="ft-contact-org">용인대 마스터 태권도</p>
-      </div>
+        <p class="ft-contact">문의 · <a href="tel:0507-1448-7577">0507-1448-7577</a></p>      </div>
       <div class="ft-right">
         <span class="ft-nav-label">Navigation</span>
         <nav class="ft-nav">
@@ -463,7 +453,7 @@
       </div>
     </div>
     <div class="ft-bottom">
-      <p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p>
+      <p class="ft-copy" id="ftCopy">© 2025 지인회 (志人會). All rights reserved.</p>
       <span class="ft-mark">志人會</span>
     </div>
   </div>
@@ -478,22 +468,23 @@
     pb.style.width=(d.scrollTop/(d.scrollHeight-d.clientHeight)*100)+'%';
   },{passive:true});
 
-  /* 스플래시 — 인터랙션(클릭·터치·마우스 이동) 시 열림 */
+  /* 스플래시 — 인터랙션 또는 1.8초 후 자동 해제 */
   const ss=document.getElementById('ss'),sl=document.getElementById('sl'),
-        sr=document.getElementById('sr'),hb=document.getElementById('hb'),
-        sp=document.getElementById('splash');
-  let opened=false;
-  function openSplash(){
-    if(opened)return; opened=true;
-    ['click','touchstart','mousemove'].forEach(ev=>window.removeEventListener(ev,openSplash));
+        sr=document.getElementById('sr'),sp=document.getElementById('splash'),
+        hb=document.getElementById('hb');
+  let closed=false;
+  function closeSplash(){
+    if(closed)return; closed=true;
+    ['click','touchstart','mousemove','keydown'].forEach(ev=>window.removeEventListener(ev,closeSplash));
     ss.classList.add('out');
-    setTimeout(()=>{sl.classList.add('open');sr.classList.add('open');},230);
+    setTimeout(()=>{ sl.classList.add('open'); sr.classList.add('open'); },230);
     setTimeout(()=>{
       sp.classList.add('out');
       setTimeout(()=>{ sp.classList.add('gone'); hb.classList.add('go'); document.getElementById('hbg').classList.add('ken'); },560);
     },900);
   }
-  ['click','touchstart','mousemove'].forEach(ev=>window.addEventListener(ev,openSplash,{passive:true}));
+  ['click','touchstart','mousemove','keydown'].forEach(ev=>window.addEventListener(ev,closeSplash,{passive:true}));
+  setTimeout(closeSplash, 1800);
 
   /* 모바일 메뉴 */
   const nh=document.getElementById('nh'),mn=document.getElementById('mob-nav');
@@ -511,6 +502,10 @@
     ci=(ci+1)%imgs.length; hbg.style.opacity='0';
     setTimeout(()=>{ hbg.style.backgroundImage=`url('${imgs[ci]}')`; hbg.style.opacity='.48'; },900);
   },5500);
+
+  /* 저작권 연도 자동 업데이트 */
+  const ftCopy=document.getElementById('ftCopy');
+  if(ftCopy) ftCopy.textContent=`© ${new Date().getFullYear()} 지인회 (志人會). All rights reserved.`;
 
   /* 리빌 */
   const ro=new IntersectionObserver(entries=>entries.forEach(e=>{
