@@ -125,7 +125,7 @@
         <nav class="ft-nav"><a href="about.html">소개</a><a href="awards.html">수상내역</a><a href="members.html">회원명단</a><a href="gallery.html">활동사진</a><a href="dojangs.html">소속도장</a><a href="contact.html">문의</a></nav>
       </div>
     </div>
-    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span></div>
+    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span><a href="login.html" class="ft-admin-link">로그인 / 회원가입</a></div>
   </div>
 </footer>
 
@@ -137,9 +137,11 @@
   <p id="lb-cap"></p>
 </div>
 
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="common.js"></script>
 <script>
-(function(){
+function initLightbox() {
   const items = [...document.querySelectorAll('.gi')];
   const lb    = document.getElementById('lb');
   const lbImg = document.getElementById('lb-img');
@@ -173,7 +175,25 @@
     if (e.key === 'ArrowLeft')  prev();
     if (e.key === 'ArrowRight') next();
   });
-})();
+}
+
+async function initGallery() {
+  if (!SUPABASE_CONFIGURED) { initLightbox(); return; }
+  try {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('id');
+    if (error || !data || !data.length) { initLightbox(); return; }
+    const grid = document.querySelector('.g-grid');
+    grid.innerHTML = data.map(g => `
+      <div class="gi">
+        <img src="${g.url}" alt="${g.caption}" loading="lazy" decoding="async">
+        <div class="gi-cap"><span>${g.caption}</span></div>
+      </div>
+    `).join('');
+  } catch (_) { /* use hardcoded fallback */ }
+  initLightbox();
+}
+initGallery();
 </script>
 </body>
 </html>

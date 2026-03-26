@@ -306,6 +306,8 @@ footer {
 }
 .ft-copy { font-size:.68rem; color:#333; letter-spacing:.05em; }
 .ft-mark { font-family:var(--serif); font-weight:900; font-size:1rem; color:rgba(255,255,255,.03); letter-spacing:.2em; }
+.ft-admin-link { font-size:.68rem; color:rgba(255,255,255,.35); letter-spacing:.1em; transition:color .2s; border-bottom:1px solid rgba(255,255,255,.15); padding-bottom:1px; }
+.ft-admin-link:hover { color:var(--white); border-bottom-color:var(--red); }
 
 /* =========================================
    REVEAL

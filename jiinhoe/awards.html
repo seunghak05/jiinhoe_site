@@ -56,16 +56,7 @@
 
 <section class="sec sec-dark">
   <div class="wrap">
-    <div class="filter-bar rv" id="af">
-      <button class="fb" data-y="all">전체 보기</button>
-      <button class="fb on" data-y="2026">2026년</button>
-      <button class="fb" data-y="2025">2025년</button>
-      <button class="fb" data-y="2024">2024년</button>
-      <button class="fb" data-y="2023">2023년</button>
-      <button class="fb" data-y="2022">2022년</button>
-      <button class="fb" data-y="2021">2021년</button>
-      <button class="fb" data-y="2020">2020년</button>
-    </div>
+    <div class="filter-bar rv" id="af"></div>
     <div id="al" class="award-list rv" style="transition-delay:.1s"></div>
   </div>
 </section>
@@ -79,13 +70,16 @@
         <nav class="ft-nav"><a href="about.html">소개</a><a href="awards.html">수상내역</a><a href="members.html">회원명단</a><a href="gallery.html">활동사진</a><a href="dojangs.html">소속도장</a><a href="contact.html">문의</a></nav>
       </div>
     </div>
-    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span></div>
+    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span><a href="login.html" class="ft-admin-link">로그인 / 회원가입</a></div>
   </div>
 </footer>
 
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="common.js"></script>
 <script>
-const AD = [
+// 하드코딩 폴백 데이터
+const AD_FALLBACK = [
   {y:2026,d:'3월 16일', n:'2026 전국종별선수권대회',                        r:['남자 지태 1부 3위: 조명성']},
   {y:2026,d:'2월 25일~28일', n:'2026년도 국가대표 선발전 아시아·세계선수권', r:['아시아선수권대회 1위: 장명진','세계선수권대회 4위: 김민화']},
   {y:2025,d:'11월 1일',  n:'제22회 대한태권도협회장배 대회',                  r:['태백 2부 여 개인전 1위: 장명진','장년 2부 페어 2위: 이진규, 김민화','천권부 남 개인전 3위: 이진규']},
@@ -125,9 +119,24 @@ const AD = [
 ];
 
 const al = document.getElementById('al');
-const afBtns = document.querySelectorAll('#af .fb');
+const af = document.getElementById('af');
+let AD = [];
+
+function buildFilterBar() {
+  const years = [...new Set(AD.map(a => a.y))].sort((a, b) => b - a);
+  const latest = years[0];
+  af.innerHTML =
+    `<button class="fb on" data-y="all">전체 보기</button>` +
+    years.map(y => `<button class="fb" data-y="${y}">${y}년</button>`).join('');
+  af.querySelectorAll('.fb').forEach(b => b.addEventListener('click', () => {
+    af.querySelectorAll('.fb').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    renderAwards(b.dataset.y === 'all' ? AD : AD.filter(a => a.y == b.dataset.y));
+  }));
+}
+
 function renderAwards(data) {
-  const f = document.querySelector('#af .fb.on').dataset.y;
+  const f = (af.querySelector('.fb.on') || {}).dataset?.y || 'all';
   al.innerHTML = '';
   if (!data.length) {
     al.innerHTML = '<p style="padding:2rem 0;color:#aaa9a4">해당 연도의 수상 내역이 없습니다.</p>';
@@ -141,12 +150,28 @@ function renderAwards(data) {
     al.appendChild(div);
   });
 }
-afBtns.forEach(b => b.addEventListener('click', () => {
-  afBtns.forEach(x => x.classList.remove('on'));
-  b.classList.add('on');
-  renderAwards(b.dataset.y === 'all' ? AD : AD.filter(a => a.y == b.dataset.y));
-}));
-renderAwards(AD.filter(a => a.y === 2026));
+
+function applyAwards() {
+  buildFilterBar();
+  renderAwards(AD);
+}
+
+async function initAwards() {
+  if (!SUPABASE_CONFIGURED) { useFallback(); return; }
+  try {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data, error } = await sb.from('awards').select('*')
+      .order('year', { ascending: false }).order('id', { ascending: false });
+    if (error || !data || !data.length) { useFallback(); return; }
+    AD = data.map(a => ({ y: a.year, d: a.date, n: a.name, r: a.results }));
+  } catch (_) { useFallback(); return; }
+  applyAwards();
+}
+function useFallback() {
+  AD = AD_FALLBACK;
+  applyAwards();
+}
+initAwards();
 </script>
 </body>
 </html>

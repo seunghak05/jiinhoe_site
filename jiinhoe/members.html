@@ -166,13 +166,16 @@
         <nav class="ft-nav"><a href="about.html">소개</a><a href="awards.html">수상내역</a><a href="members.html">회원명단</a><a href="gallery.html">활동사진</a><a href="dojangs.html">소속도장</a><a href="contact.html">문의</a></nav>
       </div>
     </div>
-    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span></div>
+    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span><a href="login.html" class="ft-admin-link">로그인 / 회원가입</a></div>
   </div>
 </footer>
 
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="common.js"></script>
 <script>
-(function(){
+// 폴백: 기존 하드코딩 카드들을 랜덤 배치
+function useFallbackMembers() {
   const grid = document.querySelector('.mem-grid');
   const cards = [...grid.children];
   for (let i = cards.length - 1; i > 0; i--) {
@@ -181,7 +184,26 @@
   }
   grid.innerHTML = '';
   cards.forEach(c => grid.appendChild(c));
-})();
+}
+
+// Supabase에서 회원 데이터 불러오기
+async function initMembers() {
+  if (!SUPABASE_CONFIGURED) { useFallbackMembers(); return; }
+  try {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data, error } = await sb.from('members').select('*').order('sort_order').order('id');
+    if (error || !data || !data.length) { useFallbackMembers(); return; }
+    const grid = document.querySelector('.mem-grid');
+    grid.innerHTML = data.map(m => `
+      <div class="mem-card">
+        <p class="mem-card-name">${m.name}</p>
+        <p class="mem-card-role">${m.role_text.replace(/·/g, '<br>')}</p>
+        ${m.badge ? `<span class="mem-card-badge">${m.badge}</span>` : ''}
+      </div>
+    `).join('');
+  } catch (_) { useFallbackMembers(); }
+}
+initMembers();
 </script>
 </body>
 </html>

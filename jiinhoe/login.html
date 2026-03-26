@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 로그인 | 지인회 (志人會)</title>
+<link rel="icon" href="img/favicon.ico/apple-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #111111;
+  --dark:  #1c1c1c;
+  --mid:   #2e2e2e;
+  --white: #f8f7f3;
+  --red:   #c0281e;
+  --dim:   #888880;
+  --serif: 'Hahmlet', serif;
+  --disp:  'Cormorant Garamond', serif;
+  --sans:  'Noto Sans KR', sans-serif;
+  --ease:  cubic-bezier(.22,.61,.36,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--sans);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 2.8rem;
+  text-decoration: none;
+}
+.login-hanja {
+  font-family: var(--serif);
+  font-weight: 900;
+  font-size: 2.2rem;
+  color: var(--red);
+  letter-spacing: .08em;
+}
+.login-sub {
+  font-family: var(--disp);
+  font-style: italic;
+  font-size: .72rem;
+  color: rgba(248,247,243,.3);
+  letter-spacing: .4em;
+}
+
+/* 탭 */
+.login-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .6rem;
+  margin-bottom: 2rem;
+}
+.login-tab {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.4);
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  padding: .9rem 0;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.login-tab:hover {
+  color: rgba(255,255,255,.75);
+  border-color: rgba(255,255,255,.25);
+}
+.login-tab.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+/* 폼 */
+.login-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: .4rem; }
+.form-label {
+  font-size: .72rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: rgba(248,247,243,.45);
+}
+.form-input {
+  background: var(--dark);
+  border: 1px solid rgba(255,255,255,.1);
+  color: var(--white);
+  font-family: var(--sans);
+  font-size: .9rem;
+  padding: .8rem 1rem;
+  outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+.form-input:focus { border-color: var(--red); }
+.form-input::placeholder { color: rgba(248,247,243,.2); }
+
+.form-btn {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  font-family: var(--sans);
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  padding: 1rem;
+  cursor: pointer;
+  margin-top: .5rem;
+  transition: background .2s;
+}
+.form-btn:hover { background: #a82218; }
+.form-btn:disabled { background: #666; cursor: not-allowed; }
+
+/* 메시지 */
+.login-msg {
+  margin-top: 1rem;
+  padding: .9rem 1rem;
+  font-size: .82rem;
+  line-height: 1.6;
+  display: none;
+}
+.login-msg.error { background: rgba(192,40,30,.15); border: 1px solid rgba(192,40,30,.3); color: #e88; }
+.login-msg.success { background: rgba(30,120,80,.15); border: 1px solid rgba(30,120,80,.3); color: #8d8; }
+.login-msg.info { background: rgba(60,100,180,.15); border: 1px solid rgba(60,100,180,.3); color: #aad; }
+.login-msg.show { display: block; }
+
+.login-back {
+  display: block;
+  text-align: center;
+  margin-top: 2rem;
+  font-size: .75rem;
+  color: rgba(248,247,243,.2);
+  letter-spacing: .08em;
+  transition: color .2s;
+  text-decoration: none;
+}
+.login-back:hover { color: rgba(248,247,243,.5); }
+
+/* 승인 대기 패널 */
+#panel-pending {
+  display: none;
+  text-align: center;
+}
+#panel-pending.show { display: block; }
+.pending-icon {
+  font-size: 3rem;
+  margin-bottom: 1.2rem;
+}
+.pending-title {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: .8rem;
+  letter-spacing: .04em;
+}
+.pending-desc {
+  font-size: .84rem;
+  color: rgba(248,247,243,.45);
+  line-height: 1.8;
+}
+.pending-logout {
+  display: inline-block;
+  margin-top: 1.6rem;
+  font-size: .75rem;
+  color: var(--dim);
+  cursor: pointer;
+  background: none;
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(248,247,243,.35);
+  padding: .5rem 1.2rem;
+  letter-spacing: .1em;
+  transition: all .2s;
+  font-family: var(--sans);
+}
+.pending-logout:hover { color: var(--white); border-color: rgba(255,255,255,.4); }
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <a href="index.html" class="login-logo">
+    <span class="login-hanja">志人會</span>
+    <span class="login-sub">Administrator</span>
+  </a>
+
+  <!-- 폼 패널 -->
+  <div id="panel-form">
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-login" onclick="switchTab('login')">로그인</button>
+      <button class="login-tab" id="tab-signup" onclick="switchTab('signup')">회원가입</button>
+    </div>
+
+    <!-- 로그인 폼 -->
+    <form class="login-form" id="form-login" onsubmit="doLogin(event)">
+      <div class="form-group">
+        <label class="form-label">이메일</label>
+        <input type="email" class="form-input" id="login-email" placeholder="admin@jiinhoe.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input type="password" class="form-input" id="login-pw" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="form-btn" id="btn-login">로그인</button>
+    </form>
+
+    <!-- 회원가입 폼 -->
+    <form class="login-form" id="form-signup" style="display:none" onsubmit="doSignup(event)">
+      <div class="form-group">
+        <label class="form-label">이름</label>
+        <input type="text" class="form-input" id="signup-name" placeholder="홍길동" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">이메일</label>
+        <input type="email" class="form-input" id="signup-email" placeholder="admin@jiinhoe.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호 (8자 이상)</label>
+        <input type="password" class="form-input" id="signup-pw" placeholder="••••••••" minlength="8" required>
+      </div>
+      <button type="submit" class="form-btn" id="btn-signup">가입 신청</button>
+    </form>
+
+    <div class="login-msg" id="login-msg"></div>
+  </div>
+
+  <!-- 승인 대기 패널 -->
+  <div id="panel-pending">
+    <div class="pending-icon">⏳</div>
+    <p class="pending-title">승인 대기 중</p>
+    <p class="pending-desc">가입 신청이 완료되었습니다.<br>최고관리자의 승인 후 관리자 패널에 접근할 수 있습니다.</p>
+    <button class="pending-logout" onclick="doLogout()">로그아웃</button>
+  </div>
+
+  <a href="index.html" class="login-back">← 메인으로 돌아가기</a>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const { createClient } = window.supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function showMsg(text, type) {
+  const el = document.getElementById('login-msg');
+  el.textContent = text;
+  el.className = 'login-msg show ' + type;
+}
+
+function switchTab(tab) {
+  document.getElementById('form-login').style.display  = tab === 'login'  ? 'flex' : 'none';
+  document.getElementById('form-signup').style.display = tab === 'signup' ? 'flex' : 'none';
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('login-msg').className = 'login-msg';
+}
+
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = '로그인 중...';
+
+  const email = document.getElementById('login-email').value;
+  const pw    = document.getElementById('login-pw').value;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  if (error) {
+    showMsg('로그인 실패: ' + (error.message === 'Invalid login credentials' ? '이메일 또는 비밀번호가 올바르지 않습니다.' : error.message), 'error');
+    btn.disabled = false;
+    btn.textContent = '로그인';
+    return;
+  }
+
+  // 승인 여부 확인
+  const { data: profile } = await sb.from('profiles').select('approved, role').eq('id', data.user.id).single();
+  if (!profile || !profile.approved) {
+    document.getElementById('panel-form').style.display = 'none';
+    document.getElementById('panel-pending').classList.add('show');
+    return;
+  }
+
+  window.location.href = 'admin.html';
+}
+
+async function doSignup(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-signup');
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+
+  const name  = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const pw    = document.getElementById('signup-pw').value;
+
+  const { error } = await sb.auth.signUp({
+    email, password: pw,
+    options: { data: { name } }
+  });
+
+  if (error) {
+    showMsg('가입 실패: ' + error.message, 'error');
+    btn.disabled = false;
+    btn.textContent = '가입 신청';
+    return;
+  }
+
+  showMsg('가입 신청이 완료되었습니다. 최고관리자의 승인 후 로그인하실 수 있습니다.', 'success');
+  document.getElementById('form-signup').reset();
+  btn.disabled = false;
+  btn.textContent = '가입 신청';
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  document.getElementById('panel-pending').classList.remove('show');
+  document.getElementById('panel-form').style.display = 'block';
+}
+
+// 이미 로그인된 경우 처리
+async function checkExisting() {
+  if (!SUPABASE_CONFIGURED) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+
+  const { data: profile } = await sb.from('profiles').select('approved').eq('id', session.user.id).single();
+  if (profile && profile.approved) {
+    window.location.href = 'admin.html';
+  } else {
+    document.getElementById('panel-form').style.display = 'none';
+    document.getElementById('panel-pending').classList.add('show');
+  }
+}
+
+checkExisting();
+</script>
+</body>
+</html>

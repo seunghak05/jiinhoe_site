@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 패널 | 지인회 (志人會)</title>
+<link rel="icon" href="img/favicon.ico/apple-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@300;400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div id="ad-loading">志人會</div>
+<div id="ad-toast"></div>
+
+<!-- 모달 -->
+<div class="ad-modal-overlay hidden" id="ad-modal">
+  <div class="ad-modal">
+    <div class="ad-modal-head">
+      <h3 class="ad-modal-title" id="modal-title">편집</h3>
+      <button class="ad-modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="ad-modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- 헤더 -->
+<header class="ad-header">
+  <a href="index.html" class="ad-header-logo">
+    <img src="img/logo_title.png" alt="지인회">
+    <span class="ad-logo-txt">Admin</span>
+  </a>
+  <div class="ad-header-right">
+    <div class="ad-user-info">
+      <span id="ad-user-email"></span>
+      <span class="ad-user-role" id="ad-user-role"></span>
+    </div>
+    <button class="ad-logout-btn" onclick="doLogout()">로그아웃</button>
+  </div>
+</header>
+
+<!-- 레이아웃 -->
+<div class="ad-layout">
+  <!-- 사이드 내비 -->
+  <nav class="ad-nav">
+    <span class="ad-nav-label">콘텐츠 관리</span>
+    <button class="ad-tab active" onclick="switchTab('awards')">수상내역</button>
+    <button class="ad-tab" onclick="switchTab('members')">회원명단</button>
+    <button class="ad-tab" onclick="switchTab('dojangs')">소속도장</button>
+    <button class="ad-tab" onclick="switchTab('gallery')">갤러리</button>
+    <span class="ad-nav-label" style="margin-top:1rem">시스템</span>
+    <button class="ad-tab" onclick="switchTab('settings')">사이트 설정</button>
+    <button class="ad-tab super-only" onclick="switchTab('admins')">관리자 관리</button>
+    <a href="index.html" class="ad-tab" style="margin-top:auto">← 사이트 보기</a>
+  </nav>
+
+  <!-- 메인 -->
+  <main class="ad-main">
+
+    <!-- ── 수상내역 ── -->
+    <div class="ad-panel active" id="panel-awards">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">수상내역</h2>
+          <p class="panel-subtitle">대회 수상 기록을 추가·수정·삭제합니다</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAwardModal()">+ 추가</button>
+      </div>
+      <div class="ad-filter-bar" id="awards-filter"></div>
+      <div class="ad-table-wrap">
+        <table class="ad-table">
+          <thead>
+            <tr>
+              <th style="width:70px">연도</th>
+              <th style="width:110px">날짜</th>
+              <th>대회명</th>
+              <th>수상 내역</th>
+              <th style="width:100px">관리</th>
+            </tr>
+          </thead>
+          <tbody id="awards-tbody"><tr><td colspan="5" class="ad-empty">불러오는 중...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── 회원명단 ── -->
+    <div class="ad-panel" id="panel-members">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">회원명단</h2>
+          <p class="panel-subtitle">소속 회원을 추가·수정·삭제합니다</p>
+        </div>
+        <button class="btn btn-primary" onclick="openMemberModal()">+ 추가</button>
+      </div>
+      <div class="ad-table-wrap">
+        <table class="ad-table">
+          <thead>
+            <tr>
+              <th style="width:80px">순서</th>
+              <th style="width:100px">이름</th>
+              <th>소속/직함</th>
+              <th style="width:90px">배지</th>
+              <th style="width:100px">관리</th>
+            </tr>
+          </thead>
+          <tbody id="members-tbody"><tr><td colspan="5" class="ad-empty">불러오는 중...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── 소속도장 ── -->
+    <div class="ad-panel" id="panel-dojangs">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">소속도장</h2>
+          <p class="panel-subtitle">소속 도장을 추가·수정·삭제합니다</p>
+        </div>
+        <button class="btn btn-primary" onclick="openDojangModal()">+ 추가</button>
+      </div>
+      <div class="ad-table-wrap">
+        <table class="ad-table">
+          <thead>
+            <tr>
+              <th style="width:80px">순서</th>
+              <th>도장명</th>
+              <th style="width:80px">지역</th>
+              <th>네이버 지도 링크</th>
+              <th style="width:100px">관리</th>
+            </tr>
+          </thead>
+          <tbody id="dojangs-tbody"><tr><td colspan="5" class="ad-empty">불러오는 중...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── 갤러리 ── -->
+    <div class="ad-panel" id="panel-gallery">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">갤러리</h2>
+          <p class="panel-subtitle">활동사진을 추가·삭제합니다</p>
+        </div>
+        <button class="btn btn-primary" onclick="openGalleryModal()">+ 사진 추가</button>
+      </div>
+      <div class="ad-gallery-grid" id="gallery-grid">
+        <div class="ad-empty" style="grid-column:1/-1">불러오는 중...</div>
+      </div>
+    </div>
+
+    <!-- ── 사이트 설정 ── -->
+    <div class="ad-panel" id="panel-settings">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">사이트 설정</h2>
+          <p class="panel-subtitle">메인 페이지 히어로 문구와 배경 슬라이드쇼를 관리합니다</p>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+      </div>
+
+      <p class="ad-section-title">히어로 문구</p>
+      <div class="ad-form" style="max-width:560px">
+        <div class="ad-form-group">
+          <label class="ad-form-label">첫째 줄 (얇은 글씨)</label>
+          <input class="ad-form-input" type="text" id="st-thin" placeholder="뜻을 모아">
+          <span class="ad-form-hint">예) 뜻을 모아 &nbsp;·&nbsp; 함께 달려가는</span>
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">둘째 줄 (빨간 굵은 글씨)</label>
+          <input class="ad-form-input" type="text" id="st-red" placeholder="한계를 깎다">
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">부제목 (두 줄로 쓰려면 줄바꿈 입력)</label>
+          <textarea class="ad-form-textarea" id="st-sub" rows="3" placeholder="지인회(志人會)는..."></textarea>
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">CTA 버튼 텍스트</label>
+          <input class="ad-form-input" type="text" id="st-cta" placeholder="지인회 소개">
+        </div>
+      </div>
+
+      <p class="ad-section-title" style="margin-top:2rem">문의 정보</p>
+      <div class="ad-form" style="max-width:560px">
+        <div class="ad-form-group">
+          <label class="ad-form-label">전화번호</label>
+          <input class="ad-form-input" type="text" id="st-phone" placeholder="0507-1448-7577">
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">기관명</label>
+          <input class="ad-form-input" type="text" id="st-org" placeholder="용인대 마스터 태권도">
+          <span class="ad-form-hint">문의 페이지에 표시되는 소속 기관명</span>
+        </div>
+      </div>
+
+      <p class="ad-section-title" style="margin-top:2rem">배경 슬라이드쇼 이미지</p>
+      <p style="font-size:.75rem;color:var(--dim);margin-bottom:1rem;line-height:1.7">
+        갤러리에 있는 이미지 URL 또는 로컬 이미지 경로를 입력하세요.<br>
+        순서대로 슬라이드됩니다. 드래그로 순서 변경 가능.
+      </p>
+      <div id="slide-list" style="max-width:560px;display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem"></div>
+      <div style="display:flex;gap:.6rem;max-width:560px">
+        <input class="ad-form-input" type="text" id="slide-new-url" placeholder="img/01.jpg 또는 https://..." style="flex:1">
+        <button class="btn btn-outline" onclick="addSlideItem()">+ 추가</button>
+      </div>
+      <p style="font-size:.7rem;color:var(--dim);margin-top:.5rem">
+        갤러리 이미지 빠른 추가:
+        <span id="gallery-quick-btns" style="display:inline-flex;flex-wrap:wrap;gap:.3rem;margin-left:.4rem"></span>
+      </p>
+    </div>
+
+    <!-- ── 관리자 관리 (최고관리자 전용) ── -->
+    <div class="ad-panel" id="panel-admins">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">관리자 관리</h2>
+          <p class="panel-subtitle">관리자 계정 승인 및 역할을 관리합니다</p>
+        </div>
+      </div>
+      <p class="ad-section-title">승인 대기</p>
+      <div id="admins-pending"></div>
+      <p class="ad-section-title" style="margin-top:2rem">승인된 관리자</p>
+      <div id="admins-approved"></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* =============================================
+   초기화
+   ============================================= */
+const { createClient } = window.supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let userProfile = null;
+let allAwards = [];
+let currentAwardFilter = 'all';
+
+// ── 인증 확인 ──
+async function initAdmin() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  const { data: profile, error } = await sb.from('profiles')
+    .select('*').eq('id', session.user.id).single();
+
+  if (error || !profile || !profile.approved) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  currentUser = session.user;
+  userProfile = profile;
+
+  document.getElementById('ad-user-email').textContent = profile.name || currentUser.email;
+  document.getElementById('ad-user-role').textContent =
+    profile.role === 'super_admin' ? '최고관리자' : '관리자';
+
+  if (profile.role === 'super_admin') {
+    document.body.classList.add('is-super');
+  }
+
+  document.getElementById('ad-loading').classList.add('hidden');
+  loadAwards();
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}
+
+/* =============================================
+   탭 전환
+   ============================================= */
+const tabMap = {
+  awards:   { panel: 'panel-awards',   load: loadAwards   },
+  members:  { panel: 'panel-members',  load: loadMembers  },
+  dojangs:  { panel: 'panel-dojangs',  load: loadDojangs  },
+  gallery:  { panel: 'panel-gallery',  load: loadGallery  },
+  settings: { panel: 'panel-settings', load: loadSettings },
+  admins:   { panel: 'panel-admins',   load: loadAdmins   },
+};
+let activeTab = 'awards';
+
+function switchTab(tab) {
+  document.querySelectorAll('.ad-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ad-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabMap[tab].panel).classList.add('active');
+  document.querySelectorAll('.ad-tab').forEach(b => {
+    if (b.textContent.trim() === {
+      awards:'수상내역', members:'회원명단', dojangs:'소속도장',
+      gallery:'갤러리', settings:'사이트 설정', admins:'관리자 관리'
+    }[tab]) b.classList.add('active');
+  });
+  activeTab = tab;
+  tabMap[tab].load();
+}
+
+/* =============================================
+   토스트
+   ============================================= */
+let toastTimer;
+function toast(msg, type = 'success') {
+  const el = document.getElementById('ad-toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 2800);
+}
+
+/* =============================================
+   모달
+   ============================================= */
+function openModal(title, bodyHTML) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('ad-modal').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('ad-modal').classList.add('hidden');
+  document.getElementById('modal-body').innerHTML = '';
+}
+document.getElementById('ad-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* =============================================
+   수상내역
+   ============================================= */
+async function loadAwards() {
+  const { data, error } = await sb.from('awards')
+    .select('*').order('year', { ascending: false }).order('id', { ascending: false });
+  if (error) { toast('수상내역 불러오기 실패', 'error'); return; }
+  allAwards = data || [];
+  buildAdminFilterBar();
+  renderAwardsTable(currentAwardFilter);
+}
+
+function buildAdminFilterBar() {
+  const years = [...new Set(allAwards.map(a => a.year))].sort((a, b) => b - a);
+  const bar = document.getElementById('awards-filter');
+  bar.innerHTML =
+    `<button class="ad-filter-btn on" data-y="all" onclick="filterAwards(this)">전체</button>` +
+    years.map(y => `<button class="ad-filter-btn" data-y="${y}" onclick="filterAwards(this)">${y}</button>`).join('');
+  currentAwardFilter = 'all';
+}
+
+function filterAwards(btn) {
+  document.querySelectorAll('#awards-filter .ad-filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  currentAwardFilter = btn.dataset.y;
+  renderAwardsTable(currentAwardFilter);
+}
+
+function renderAwardsTable(filter) {
+  const list = filter === 'all' ? allAwards : allAwards.filter(a => a.year == filter);
+  const tbody = document.getElementById('awards-tbody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="ad-empty">해당 연도의 수상 내역이 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(a => `
+    <tr>
+      <td>${a.year}</td>
+      <td style="font-size:.78rem;color:var(--dim)">${a.date || ''}</td>
+      <td style="font-weight:500">${a.name}</td>
+      <td>
+        <ul class="result-list">
+          ${(a.results || []).map(r => `<li>${r}</li>`).join('')}
+        </ul>
+      </td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-outline" onclick="openAwardModal(${a.id})">편집</button>
+          <button class="btn btn-danger"  onclick="deleteAward(${a.id})">삭제</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openAwardModal(id) {
+  const a = id ? allAwards.find(x => x.id === id) : null;
+  openModal(id ? '수상내역 편집' : '수상내역 추가', `
+    <form class="ad-form" onsubmit="saveAward(event, ${id || 'null'})">
+      <div class="ad-form-group">
+        <label class="ad-form-label">연도</label>
+        <input class="ad-form-input" type="number" id="aw-year" value="${a ? a.year : new Date().getFullYear()}" min="2000" max="2100" required>
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">날짜 (예: 3월 15일)</label>
+        <input class="ad-form-input" type="text" id="aw-date" value="${a ? a.date : ''}" placeholder="3월 15일">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">대회명</label>
+        <input class="ad-form-input" type="text" id="aw-name" value="${a ? escHtml(a.name) : ''}" required placeholder="제00회 전국태권도대회">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">수상 내역</label>
+        <textarea class="ad-form-textarea" id="aw-results" rows="6" required placeholder="한 줄에 하나씩 입력&#10;예) 태백 1부 1위: 홍길동&#10;천권부 여자 2위: 김철수">${a ? a.results.join('\n') : ''}</textarea>
+        <span class="ad-form-hint">한 줄 = 수상자 1명 (엔터로 구분)</span>
+      </div>
+      <div class="ad-form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+        <button type="submit" class="btn btn-primary">${id ? '저장' : '추가'}</button>
+      </div>
+    </form>
+  `);
+}
+
+async function saveAward(e, id) {
+  e.preventDefault();
+  const year    = parseInt(document.getElementById('aw-year').value);
+  const date    = document.getElementById('aw-date').value.trim();
+  const name    = document.getElementById('aw-name').value.trim();
+  const results = document.getElementById('aw-results').value
+    .split('\n').map(s => s.trim()).filter(Boolean);
+
+  const payload = { year, date, name, results };
+
+  let error;
+  if (id) {
+    ({ error } = await sb.from('awards').update(payload).eq('id', id));
+  } else {
+    ({ error } = await sb.from('awards').insert(payload));
+  }
+  if (error) { toast('저장 실패: ' + error.message, 'error'); return; }
+  toast(id ? '수상내역이 수정되었습니다' : '수상내역이 추가되었습니다');
+  closeModal();
+  loadAwards();
+}
+
+async function deleteAward(id) {
+  if (!confirm('이 수상내역을 삭제하시겠습니까?')) return;
+  const { error } = await sb.from('awards').delete().eq('id', id);
+  if (error) { toast('삭제 실패', 'error'); return; }
+  toast('삭제되었습니다');
+  loadAwards();
+}
+
+/* =============================================
+   회원명단
+   ============================================= */
+let allMembers = [];
+
+async function loadMembers() {
+  const { data, error } = await sb.from('members').select('*').order('sort_order').order('id');
+  if (error) { toast('회원명단 불러오기 실패', 'error'); return; }
+  allMembers = data || [];
+  const tbody = document.getElementById('members-tbody');
+  if (!allMembers.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="ad-empty">등록된 회원이 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allMembers.map(m => `
+    <tr>
+      <td style="color:var(--dim)">${m.sort_order}</td>
+      <td style="font-weight:500;font-family:var(--serif)">${m.name}</td>
+      <td style="font-size:.82rem">${m.role_text}</td>
+      <td>${m.badge ? `<span class="td-badge">${m.badge}</span>` : ''}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-outline" onclick="openMemberModal(${m.id})">편집</button>
+          <button class="btn btn-danger"  onclick="deleteMember(${m.id})">삭제</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openMemberModal(id) {
+  const m = id ? allMembers.find(x => x.id === id) : null;
+  openModal(id ? '회원 편집' : '회원 추가', `
+    <form class="ad-form" onsubmit="saveMember(event, ${id || 'null'})">
+      <div class="ad-form-group">
+        <label class="ad-form-label">이름</label>
+        <input class="ad-form-input" type="text" id="mb-name" value="${m ? escHtml(m.name) : ''}" required placeholder="홍길동">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">소속 / 직함</label>
+        <input class="ad-form-input" type="text" id="mb-role" value="${m ? escHtml(m.role_text) : ''}" placeholder="○○태권도장 관장">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">배지 (특별 표시, 선택)</label>
+        <input class="ad-form-input" type="text" id="mb-badge" value="${m ? escHtml(m.badge) : ''}" placeholder="명예회원">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">표시 순서</label>
+        <input class="ad-form-input" type="number" id="mb-order" value="${m ? m.sort_order : (allMembers.length + 1)}" min="0">
+      </div>
+      <div class="ad-form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+        <button type="submit" class="btn btn-primary">${id ? '저장' : '추가'}</button>
+      </div>
+    </form>
+  `);
+}
+
+async function saveMember(e, id) {
+  e.preventDefault();
+  const payload = {
+    name:       document.getElementById('mb-name').value.trim(),
+    role_text:  document.getElementById('mb-role').value.trim(),
+    badge:      document.getElementById('mb-badge').value.trim(),
+    sort_order: parseInt(document.getElementById('mb-order').value) || 0,
+  };
+  let error;
+  if (id) {
+    ({ error } = await sb.from('members').update(payload).eq('id', id));
+  } else {
+    ({ error } = await sb.from('members').insert(payload));
+  }
+  if (error) { toast('저장 실패: ' + error.message, 'error'); return; }
+  toast(id ? '회원 정보가 수정되었습니다' : '회원이 추가되었습니다');
+  closeModal();
+  loadMembers();
+}
+
+async function deleteMember(id) {
+  const m = allMembers.find(x => x.id === id);
+  if (!confirm(`'${m?.name}' 회원을 삭제하시겠습니까?`)) return;
+  const { error } = await sb.from('members').delete().eq('id', id);
+  if (error) { toast('삭제 실패', 'error'); return; }
+  toast('삭제되었습니다');
+  loadMembers();
+}
+
+/* =============================================
+   소속도장
+   ============================================= */
+let allDojangs = [];
+
+async function loadDojangs() {
+  const { data, error } = await sb.from('dojangs').select('*').order('sort_order').order('id');
+  if (error) { toast('소속도장 불러오기 실패', 'error'); return; }
+  allDojangs = data || [];
+  const tbody = document.getElementById('dojangs-tbody');
+  if (!allDojangs.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="ad-empty">등록된 도장이 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = allDojangs.map(d => `
+    <tr>
+      <td style="color:var(--dim)">${d.sort_order}</td>
+      <td style="font-weight:500">${d.name}</td>
+      <td><span class="td-tag">${d.region}</span></td>
+      <td style="font-size:.78rem">
+        ${d.map_link ? `<a href="${d.map_link}" target="_blank" style="color:var(--dim);text-decoration:underline">${d.map_link.substring(0, 40)}…</a>` : '—'}
+      </td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-outline" onclick="openDojangModal(${d.id})">편집</button>
+          <button class="btn btn-danger"  onclick="deleteDojang(${d.id})">삭제</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openDojangModal(id) {
+  const d = id ? allDojangs.find(x => x.id === id) : null;
+  openModal(id ? '도장 편집' : '도장 추가', `
+    <form class="ad-form" onsubmit="saveDojang(event, ${id || 'null'})">
+      <div class="ad-form-group">
+        <label class="ad-form-label">도장명</label>
+        <input class="ad-form-input" type="text" id="dj-name" value="${d ? escHtml(d.name) : ''}" required placeholder="○○태권도장">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">지역</label>
+        <select class="ad-form-select" id="dj-region">
+          ${['전주시','군산시','완주군','진안군','익산시','정읍시','기타'].map(r =>
+            `<option value="${r}" ${d && d.region === r ? 'selected' : ''}>${r}</option>`
+          ).join('')}
+        </select>
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">네이버 지도 링크</label>
+        <input class="ad-form-input" type="url" id="dj-link" value="${d ? escHtml(d.map_link) : ''}" placeholder="https://naver.me/...">
+        <span class="ad-form-hint">네이버 지도에서 '공유 → 링크 복사' 로 얻을 수 있습니다</span>
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">표시 순서</label>
+        <input class="ad-form-input" type="number" id="dj-order" value="${d ? d.sort_order : (allDojangs.length + 1)}" min="0">
+      </div>
+      <div class="ad-form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+        <button type="submit" class="btn btn-primary">${id ? '저장' : '추가'}</button>
+      </div>
+    </form>
+  `);
+}
+
+async function saveDojang(e, id) {
+  e.preventDefault();
+  const payload = {
+    name:       document.getElementById('dj-name').value.trim(),
+    region:     document.getElementById('dj-region').value,
+    map_link:   document.getElementById('dj-link').value.trim(),
+    sort_order: parseInt(document.getElementById('dj-order').value) || 0,
+  };
+  let error;
+  if (id) {
+    ({ error } = await sb.from('dojangs').update(payload).eq('id', id));
+  } else {
+    ({ error } = await sb.from('dojangs').insert(payload));
+  }
+  if (error) { toast('저장 실패: ' + error.message, 'error'); return; }
+  toast(id ? '도장 정보가 수정되었습니다' : '도장이 추가되었습니다');
+  closeModal();
+  loadDojangs();
+}
+
+async function deleteDojang(id) {
+  const d = allDojangs.find(x => x.id === id);
+  if (!confirm(`'${d?.name}' 도장을 삭제하시겠습니까?`)) return;
+  const { error } = await sb.from('dojangs').delete().eq('id', id);
+  if (error) { toast('삭제 실패', 'error'); return; }
+  toast('삭제되었습니다');
+  loadDojangs();
+}
+
+/* =============================================
+   갤러리
+   ============================================= */
+let allGallery = [];
+
+async function loadGallery() {
+  const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('id');
+  if (error) { toast('갤러리 불러오기 실패', 'error'); return; }
+  allGallery = data || [];
+  const grid = document.getElementById('gallery-grid');
+  if (!allGallery.length) {
+    grid.innerHTML = '<div class="ad-empty" style="grid-column:1/-1">등록된 사진이 없습니다</div>';
+    return;
+  }
+  grid.innerHTML = allGallery.map(g => `
+    <div class="ad-gallery-item">
+      <img src="${escAttr(g.url)}" alt="${escAttr(g.caption)}" loading="lazy" onerror="this.style.opacity='.2'">
+      <div class="ad-gallery-item-cap">${g.caption}</div>
+      <div class="ad-gallery-item-actions">
+        <button class="btn btn-danger" onclick="deleteGallery(${g.id})">삭제</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openGalleryModal() {
+  openModal('사진 추가', `
+    <div class="ad-form">
+      <p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:1rem">
+        Supabase Storage에 이미지를 업로드하거나 외부 이미지 URL을 직접 입력할 수 있습니다.
+      </p>
+
+      <div class="ad-form-group">
+        <label class="ad-form-label">이미지 업로드</label>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('gallery-file').click()">
+          <input type="file" id="gallery-file" accept="image/*" multiple onchange="handleFileSelect(event)">
+          <div class="upload-zone-txt">
+            <strong>클릭하여 이미지 선택</strong><br>
+            JPG, PNG, WebP 지원 · 여러 파일 동시 선택 가능
+          </div>
+        </div>
+        <div id="upload-preview" style="display:none;margin-top:.8rem">
+          <p style="font-size:.72rem;color:var(--dim);margin-bottom:.4rem" id="upload-count"></p>
+          <div id="upload-thumb-list" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-upload" onclick="uploadFiles()" style="display:none;margin-top:.6rem">업로드 시작</button>
+      </div>
+
+      <div style="text-align:center;font-size:.72rem;color:var(--dim);margin:.5rem 0">또는</div>
+
+      <form class="ad-form" onsubmit="saveGalleryUrl(event)">
+        <div class="ad-form-group">
+          <label class="ad-form-label">이미지 URL 직접 입력</label>
+          <input class="ad-form-input" type="url" id="gal-url" placeholder="https://...">
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">캡션</label>
+          <input class="ad-form-input" type="text" id="gal-cap" placeholder="정기수련">
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">표시 순서</label>
+          <input class="ad-form-input" type="number" id="gal-order" value="${allGallery.length + 1}" min="0">
+        </div>
+        <div class="ad-form-actions">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+          <button type="submit" class="btn btn-primary">URL로 추가</button>
+        </div>
+      </form>
+    </div>
+  `);
+
+  // 드래그앤드롭
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const dt = new DataTransfer();
+    [...e.dataTransfer.files].forEach(f => dt.items.add(f));
+    document.getElementById('gallery-file').files = dt.files;
+    handleFileSelect({ target: { files: dt.files } });
+  });
+}
+
+let selectedFiles = [];
+
+function handleFileSelect(e) {
+  selectedFiles = [...e.target.files];
+  if (!selectedFiles.length) return;
+  document.getElementById('upload-count').textContent = `${selectedFiles.length}개 파일 선택됨`;
+  document.getElementById('upload-thumb-list').innerHTML = selectedFiles.map((f, i) =>
+    `<div style="width:60px;height:60px;background:#222;position:relative;overflow:hidden">
+      <img id="thumb-${i}" style="width:100%;height:100%;object-fit:cover">
+    </div>`
+  ).join('');
+  selectedFiles.forEach((f, i) => {
+    const r = new FileReader();
+    r.onload = ev => { const el = document.getElementById('thumb-' + i); if (el) el.src = ev.target.result; };
+    r.readAsDataURL(f);
+  });
+  document.getElementById('upload-preview').style.display = 'block';
+  document.getElementById('btn-upload').style.display = 'inline-flex';
+}
+
+async function uploadFiles() {
+  if (!selectedFiles.length) return;
+  const btn = document.getElementById('btn-upload');
+  btn.disabled = true;
+  btn.textContent = '업로드 중...';
+  let success = 0;
+  for (const file of selectedFiles) {
+    const ext = file.name.split('.').pop();
+    const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error: upErr } = await sb.storage.from('gallery').upload(path, file);
+    if (upErr) { toast(`업로드 실패: ${file.name}`, 'error'); continue; }
+    const { data: { publicUrl } } = sb.storage.from('gallery').getPublicUrl(path);
+    const caption = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    const { error: dbErr } = await sb.from('gallery').insert({
+      url: publicUrl,
+      caption,
+      sort_order: allGallery.length + success + 1
+    });
+    if (!dbErr) success++;
+  }
+  toast(`${success}개 사진이 추가되었습니다`);
+  closeModal();
+  loadGallery();
+}
+
+async function saveGalleryUrl(e) {
+  e.preventDefault();
+  const url = document.getElementById('gal-url').value.trim();
+  if (!url) return;
+  const payload = {
+    url,
+    caption:    document.getElementById('gal-cap').value.trim(),
+    sort_order: parseInt(document.getElementById('gal-order').value) || 0,
+  };
+  const { error } = await sb.from('gallery').insert(payload);
+  if (error) { toast('추가 실패: ' + error.message, 'error'); return; }
+  toast('사진이 추가되었습니다');
+  closeModal();
+  loadGallery();
+}
+
+async function deleteGallery(id) {
+  if (!confirm('이 사진을 삭제하시겠습니까?')) return;
+  const item = allGallery.find(x => x.id === id);
+  // Supabase Storage 업로드 파일이면 Storage에서도 삭제
+  if (item?.url && item.url.includes('supabase') && item.url.includes('/gallery/')) {
+    try {
+      const path = item.url.split('/gallery/')[1];
+      await sb.storage.from('gallery').remove([path]);
+    } catch (_) {}
+  }
+  const { error } = await sb.from('gallery').delete().eq('id', id);
+  if (error) { toast('삭제 실패', 'error'); return; }
+  toast('삭제되었습니다');
+  loadGallery();
+}
+
+/* =============================================
+   관리자 관리 (최고관리자 전용)
+   ============================================= */
+let allAdmins = [];
+
+async function loadAdmins() {
+  const { data, error } = await sb.from('profiles').select('*').order('created_at');
+  if (error) { toast('관리자 목록 불러오기 실패', 'error'); return; }
+  allAdmins = data || [];
+  renderAdmins();
+}
+
+function renderAdmins() {
+  const pending  = allAdmins.filter(a => !a.approved && a.id !== currentUser.id);
+  const approved = allAdmins.filter(a =>  a.approved && a.id !== currentUser.id);
+
+  const pendingEl  = document.getElementById('admins-pending');
+  const approvedEl = document.getElementById('admins-approved');
+
+  if (!pending.length) {
+    pendingEl.innerHTML = '<p style="font-size:.8rem;color:var(--dim)">승인 대기 중인 관리자가 없습니다</p>';
+  } else {
+    pendingEl.innerHTML = pending.map(a => `
+      <div class="admin-card">
+        <div class="admin-card-info">
+          <p class="admin-card-name">${escHtml(a.name || '(이름 없음)')}</p>
+          <p class="admin-card-email">${escHtml(a.email)} · ${formatDate(a.created_at)}</p>
+        </div>
+        <div class="admin-card-actions">
+          <button class="btn btn-success" onclick="approveAdmin('${a.id}')">승인</button>
+          <button class="btn btn-danger"  onclick="deleteAdmin('${a.id}', '${escAttr(a.name || a.email)}')">거절</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (!approved.length) {
+    approvedEl.innerHTML = '<p style="font-size:.8rem;color:var(--dim)">본인 외 승인된 관리자가 없습니다</p>';
+  } else {
+    approvedEl.innerHTML = approved.map(a => `
+      <div class="admin-card">
+        <div class="admin-card-info">
+          <p class="admin-card-name">
+            ${escHtml(a.name || '(이름 없음)')}
+            <span class="ad-user-role">${a.role === 'super_admin' ? '최고관리자' : '관리자'}</span>
+          </p>
+          <p class="admin-card-email">${escHtml(a.email)} · ${formatDate(a.created_at)}</p>
+        </div>
+        <div class="admin-card-actions">
+          ${a.role !== 'super_admin'
+            ? `<button class="btn btn-outline" onclick="changeRole('${a.id}', 'super_admin')">최고관리자로</button>`
+            : `<button class="btn btn-outline" onclick="changeRole('${a.id}', 'admin')">일반관리자로</button>`
+          }
+          <button class="btn btn-danger" onclick="deleteAdmin('${a.id}', '${escAttr(a.name || a.email)}')">삭제</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+async function approveAdmin(id) {
+  const { error } = await sb.from('profiles').update({ approved: true }).eq('id', id);
+  if (error) { toast('승인 실패', 'error'); return; }
+  toast('승인되었습니다');
+  loadAdmins();
+}
+
+async function changeRole(id, role) {
+  const label = role === 'super_admin' ? '최고관리자' : '일반관리자';
+  if (!confirm(`${label}로 변경하시겠습니까?`)) return;
+  const { error } = await sb.from('profiles').update({ role }).eq('id', id);
+  if (error) { toast('변경 실패', 'error'); return; }
+  toast(`역할이 ${label}로 변경되었습니다`);
+  loadAdmins();
+}
+
+async function deleteAdmin(id, name) {
+  if (!confirm(`'${name}' 관리자 계정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
+  const { error } = await sb.from('profiles').delete().eq('id', id);
+  if (error) { toast('삭제 실패', 'error'); return; }
+  toast('계정이 삭제되었습니다');
+  loadAdmins();
+}
+
+/* =============================================
+   사이트 설정
+   ============================================= */
+let siteSettings = {};
+let slideImages = [];
+
+async function loadSettings() {
+  const { data, error } = await sb.from('settings').select('key, value');
+  if (error) { toast('설정 불러오기 실패', 'error'); return; }
+  siteSettings = {};
+  (data || []).forEach(r => { siteSettings[r.key] = r.value; });
+
+  // 폼 채우기
+  document.getElementById('st-thin').value  = siteSettings.hero_thin    || '뜻을 모아';
+  document.getElementById('st-red').value   = siteSettings.hero_red     || '한계를 깎다';
+  document.getElementById('st-sub').value   = siteSettings.hero_sub     || '';
+  document.getElementById('st-cta').value   = siteSettings.hero_cta     || '지인회 소개';
+  document.getElementById('st-phone').value = siteSettings.contact_phone || '0507-1448-7577';
+  document.getElementById('st-org').value   = siteSettings.contact_org   || '용인대 마스터 태권도';
+
+  // 슬라이드쇼 이미지 목록
+  try {
+    slideImages = JSON.parse(siteSettings.hero_slideshow || '[]');
+  } catch (_) { slideImages = []; }
+  if (!slideImages.length) {
+    slideImages = ['img/train1.jpg','img/train2.jpg','img/train3.jpg',
+      'img/01.jpg','img/05.jpg','img/06.jpg','img/07.jpg','img/08.jpg',
+      'img/10.jpg','img/13.jpg','img/14.jpg'];
+  }
+  renderSlideList();
+
+  // 갤러리 이미지 빠른추가 버튼
+  const quickEl = document.getElementById('gallery-quick-btns');
+  if (allGallery.length) {
+    quickEl.innerHTML = allGallery.slice(0, 12).map(g => {
+      const short = g.url.split('/').pop().split('?')[0];
+      return `<button class="btn btn-outline" style="font-size:.6rem;padding:.2rem .5rem"
+        onclick="quickAddSlide('${g.url.replace(/'/g,"\\'")}')">${short}</button>`;
+    }).join('');
+  } else {
+    quickEl.innerHTML = '<span style="color:var(--dim);font-size:.7rem">갤러리 탭을 먼저 로드하세요</span>';
+  }
+}
+
+function renderSlideList() {
+  const el = document.getElementById('slide-list');
+  if (!slideImages.length) {
+    el.innerHTML = '<p style="font-size:.78rem;color:var(--dim)">슬라이드 이미지가 없습니다</p>';
+    return;
+  }
+  el.innerHTML = slideImages.map((url, i) => `
+    <div style="display:flex;align-items:center;gap:.6rem;background:var(--mid);border:1px solid var(--border);padding:.5rem .8rem">
+      <img src="${url}" style="width:48px;height:36px;object-fit:cover;flex-shrink:0" onerror="this.style.opacity='.2'">
+      <span style="flex:1;font-size:.75rem;color:rgba(248,247,243,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${url}</span>
+      <button class="btn" style="color:rgba(248,247,243,.3);font-size:.8rem;padding:.2rem" onclick="moveSlide(${i},-1)" ${i===0?'disabled':''}>↑</button>
+      <button class="btn" style="color:rgba(248,247,243,.3);font-size:.8rem;padding:.2rem" onclick="moveSlide(${i},1)" ${i===slideImages.length-1?'disabled':''}>↓</button>
+      <button class="btn btn-danger" style="font-size:.7rem;padding:.3rem .6rem" onclick="removeSlide(${i})">삭제</button>
+    </div>
+  `).join('');
+}
+
+function addSlideItem() {
+  const input = document.getElementById('slide-new-url');
+  const url = input.value.trim();
+  if (!url) return;
+  slideImages.push(url);
+  input.value = '';
+  renderSlideList();
+}
+
+function quickAddSlide(url) {
+  if (!slideImages.includes(url)) {
+    slideImages.push(url);
+    renderSlideList();
+    toast('추가됨: ' + url.split('/').pop());
+  }
+}
+
+function removeSlide(i) {
+  slideImages.splice(i, 1);
+  renderSlideList();
+}
+
+function moveSlide(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= slideImages.length) return;
+  [slideImages[i], slideImages[j]] = [slideImages[j], slideImages[i]];
+  renderSlideList();
+}
+
+async function saveSettings() {
+  const updates = [
+    { key: 'hero_thin',      value: document.getElementById('st-thin').value.trim()  },
+    { key: 'hero_red',       value: document.getElementById('st-red').value.trim()   },
+    { key: 'hero_sub',       value: document.getElementById('st-sub').value.trim()   },
+    { key: 'hero_cta',       value: document.getElementById('st-cta').value.trim()   },
+    { key: 'hero_slideshow', value: JSON.stringify(slideImages)                       },
+    { key: 'contact_phone',  value: document.getElementById('st-phone').value.trim() },
+    { key: 'contact_org',    value: document.getElementById('st-org').value.trim()   },
+  ];
+
+  for (const row of updates) {
+    const { error } = await sb.from('settings').upsert(row, { onConflict: 'key' });
+    if (error) { toast('저장 실패: ' + row.key, 'error'); return; }
+  }
+  toast('사이트 설정이 저장되었습니다');
+}
+
+/* =============================================
+   유틸
+   ============================================= */
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(str) {
+  return String(str || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function formatDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+}
+
+/* ── 시작 ── */
+initAdmin();
+</script>
+</body>
+</html>

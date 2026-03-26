@@ -345,12 +345,12 @@
       <span class="hero-eyebrow-txt">Jiin-hoe · 志人會 · Jeonbuk Taekwondo</span>
     </div>
     <h1 class="hero-title">
-      <span class="thin">뜻을 모아</span><br>
-      <span class="red">한계를 깎다</span>
+      <span class="thin" id="hero-thin">뜻을 모아</span><br>
+      <span class="red" id="hero-red">한계를 깎다</span>
     </h1>
-    <p class="hero-sub">지인회(志人會)는 전북특별자치도 태권도 품새 전문 선수단입니다.<br>체계적인 훈련과 단합된 팀워크를 바탕으로 실력을 증명해 나갑니다.</p>
+    <p class="hero-sub" id="hero-sub">지인회(志人會)는 전북특별자치도 태권도 품새 전문 선수단입니다.<br>체계적인 훈련과 단합된 팀워크를 바탕으로 실력을 증명해 나갑니다.</p>
     <a href="about.html" class="hero-cta">
-      지인회 소개 <span class="hero-cta-arrow">→</span>
+      <span id="hero-cta-txt">지인회 소개</span> <span class="hero-cta-arrow">→</span>
     </a>
   </div>
   <div class="hero-scroll">
@@ -455,10 +455,13 @@
     <div class="ft-bottom">
       <p class="ft-copy" id="ftCopy">© 2025 지인회 (志人會). All rights reserved.</p>
       <span class="ft-mark">志人會</span>
+      <a href="login.html" class="ft-admin-link">로그인 / 회원가입</a>
     </div>
   </div>
 </footer>
 
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (function(){
   /* 프로그레스 */
@@ -491,17 +494,22 @@
   nh.addEventListener('click',()=>mn.classList.toggle('open'));
   mn.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mn.classList.remove('open')));
 
-  /* 히어로 배경 슬라이드 */
-  const imgs=['img/train1.jpg','img/train2.jpg','img/train3.jpg',
-              'img/01.jpg','img/05.jpg','img/06.jpg',
-              'img/07.jpg','img/08.jpg','img/10.jpg',
-              'img/13.jpg','img/14.jpg'];
+  /* 히어로 배경 슬라이드 — 기본값 */
+  let IMGS=['img/train1.jpg','img/train2.jpg','img/train3.jpg',
+            'img/01.jpg','img/05.jpg','img/06.jpg',
+            'img/07.jpg','img/08.jpg','img/10.jpg',
+            'img/13.jpg','img/14.jpg'];
   const hbg=document.getElementById('hbg');
-  let ci=0;
-  setInterval(()=>{
-    ci=(ci+1)%imgs.length; hbg.style.opacity='0';
-    setTimeout(()=>{ hbg.style.backgroundImage=`url('${imgs[ci]}')`; hbg.style.opacity='.48'; },900);
-  },5500);
+  let ci=0, slideTimer=null;
+
+  function startSlide(){
+    if(slideTimer) clearInterval(slideTimer);
+    slideTimer=setInterval(()=>{
+      ci=(ci+1)%IMGS.length; hbg.style.opacity='0';
+      setTimeout(()=>{ hbg.style.backgroundImage=`url('${IMGS[ci]}')`; hbg.style.opacity='.48'; },900);
+    },5500);
+  }
+  startSlide();
 
   /* 저작권 연도 자동 업데이트 */
   const ftCopy=document.getElementById('ftCopy');
@@ -512,6 +520,30 @@
     if(e.isIntersecting){ e.target.classList.add('in'); ro.unobserve(e.target); }
   }),{threshold:.08});
   document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+})();
+
+/* Supabase에서 히어로 설정 불러오기 */
+(async function(){
+  if(typeof SUPABASE_CONFIGURED==='undefined'||!SUPABASE_CONFIGURED) return;
+  try{
+    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    const {data,error}=await sb.from('settings').select('key,value');
+    if(error||!data) return;
+    const s={};
+    data.forEach(r=>{ s[r.key]=r.value; });
+    if(s.hero_thin)    document.getElementById('hero-thin').textContent=s.hero_thin;
+    if(s.hero_red)     document.getElementById('hero-red').textContent=s.hero_red;
+    if(s.hero_sub)     document.getElementById('hero-sub').innerHTML=s.hero_sub.replace(/\n/g,'<br>');
+    if(s.hero_cta)     document.getElementById('hero-cta-txt').textContent=s.hero_cta;
+    if(s.hero_slideshow){
+      try{
+        const imgs=JSON.parse(s.hero_slideshow);
+        if(Array.isArray(imgs)&&imgs.length){
+          IMGS=imgs;
+        }
+      }catch(_){}
+    }
+  }catch(_){}
 })();
 </script>
 </body>

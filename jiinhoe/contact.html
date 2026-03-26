@@ -136,8 +136,8 @@
     <!-- 전화번호 풀 블록 -->
     <div class="ct-phone-hero rv">
       <p class="ct-label">문의 전화</p>
-      <a href="tel:0507-1448-7577" class="ct-phone">0507-1448-7577</a>
-      <p class="ct-org">용인대 마스터 태권도 &nbsp;·&nbsp; 전북특별자치도 태권도 품새팀</p>
+      <a id="ct-phone" href="tel:0507-1448-7577" class="ct-phone">0507-1448-7577</a>
+      <p class="ct-org" id="ct-org">용인대 마스터 태권도 &nbsp;·&nbsp; 전북특별자치도 태권도 품새팀</p>
     </div>
 
     <!-- 입단 문의 -->
@@ -169,10 +169,33 @@
         </nav>
       </div>
     </div>
-    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span></div>
+    <div class="ft-bottom"><p class="ft-copy">© 2025 지인회 (志人會). All rights reserved.</p><span class="ft-mark">志人會</span><a href="login.html" class="ft-admin-link">로그인 / 회원가입</a></div>
   </div>
 </footer>
 
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="common.js"></script>
+<script>
+(async function(){
+  if (!SUPABASE_CONFIGURED) return;
+  try {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data } = await sb.from('settings').select('key,value')
+      .in('key', ['contact_phone','contact_org']);
+    if (!data) return;
+    const s = {};
+    data.forEach(r => { s[r.key] = r.value; });
+    if (s.contact_phone) {
+      const el = document.getElementById('ct-phone');
+      el.textContent = s.contact_phone;
+      el.href = 'tel:' + s.contact_phone.replace(/[^0-9]/g,'');
+    }
+    if (s.contact_org) {
+      document.getElementById('ct-org').textContent = s.contact_org + ' · 전북특별자치도 태권도 품새팀';
+    }
+  } catch(_) {}
+})();
+</script>
 </body>
 </html>
