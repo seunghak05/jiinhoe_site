@@ -291,15 +291,9 @@ async function doLogin(e) {
     return;
   }
 
-  // 승인 여부 확인
-  const { data: profile, error: pErr } = await sb.from('profiles').select('approved, role').eq('id', data.user.id).single();
-  if (pErr) {
-    showMsg('프로필 오류: ' + pErr.message + ' (code: ' + pErr.code + ')', 'error');
-    btn.disabled = false;
-    btn.textContent = '로그인';
-    return;
-  }
-  if (!profile || !profile.approved) {
+  // 승인 여부 확인 (RPC로 RLS 우회)
+  const { data: profile, error: pErr } = await sb.rpc('get_my_profile');
+  if (pErr || !profile || !profile.approved) {
     document.getElementById('panel-form').style.display = 'none';
     document.getElementById('panel-pending').classList.add('show');
     return;
@@ -348,10 +342,10 @@ async function checkExisting() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return;
 
-  const { data: profile } = await sb.from('profiles').select('approved').eq('id', session.user.id).single();
+  const { data: profile } = await sb.rpc('get_my_profile');
   if (profile && profile.approved) {
     window.location.href = 'admin.html';
-  } else {
+  } else if (profile && !profile.approved) {
     document.getElementById('panel-form').style.display = 'none';
     document.getElementById('panel-pending').classList.add('show');
   }

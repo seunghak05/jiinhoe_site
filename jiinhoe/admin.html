@@ -248,8 +248,7 @@ async function initAdmin() {
     return;
   }
 
-  const { data: profile, error } = await sb.from('profiles')
-    .select('*').eq('id', session.user.id).single();
+  const { data: profile, error } = await sb.rpc('get_my_profile');
 
   if (error || !profile || !profile.approved) {
     window.location.href = 'login.html';
@@ -485,7 +484,8 @@ function openMemberModal(id) {
       </div>
       <div class="ad-form-group">
         <label class="ad-form-label">소속 / 직함</label>
-        <input class="ad-form-input" type="text" id="mb-role" value="${m ? escHtml(m.role_text) : ''}" placeholder="○○태권도장 관장">
+        <textarea class="ad-form-textarea" id="mb-role" rows="3" placeholder="○○태권도장 관장&#10;두 번째 줄은 엔터로 구분">${m ? escHtml(m.role_text.replace(/·/g, '\n')) : ''}</textarea>
+        <span class="ad-form-hint">여러 줄로 쓰면 카드에서 줄바꿈으로 표시됩니다</span>
       </div>
       <div class="ad-form-group">
         <label class="ad-form-label">배지 (특별 표시, 선택)</label>
@@ -507,7 +507,7 @@ async function saveMember(e, id) {
   e.preventDefault();
   const payload = {
     name:       document.getElementById('mb-name').value.trim(),
-    role_text:  document.getElementById('mb-role').value.trim(),
+    role_text:  document.getElementById('mb-role').value.trim().replace(/\n/g, '·'),
     badge:      document.getElementById('mb-badge').value.trim(),
     sort_order: parseInt(document.getElementById('mb-order').value) || 0,
   };
@@ -582,7 +582,7 @@ function openDojangModal(id) {
       </div>
       <div class="ad-form-group">
         <label class="ad-form-label">네이버 지도 링크</label>
-        <input class="ad-form-input" type="url" id="dj-link" value="${d ? escHtml(d.map_link) : ''}" placeholder="https://naver.me/...">
+        <input class="ad-form-input" type="text" id="dj-link" value="${d ? escHtml(d.map_link) : ''}" placeholder="https://naver.me/...">
         <span class="ad-form-hint">네이버 지도에서 '공유 → 링크 복사' 로 얻을 수 있습니다</span>
       </div>
       <div class="ad-form-group">
@@ -794,9 +794,9 @@ async function deleteGallery(id) {
 let allAdmins = [];
 
 async function loadAdmins() {
-  const { data, error } = await sb.from('profiles').select('*').order('created_at');
-  if (error) { toast('관리자 목록 불러오기 실패', 'error'); return; }
-  allAdmins = data || [];
+  const { data, error } = await sb.rpc('admin_get_profiles');
+  if (error) { toast('회원 목록 불러오기 실패', 'error'); return; }
+  allAdmins = (data && !Array.isArray(data)) ? [data] : (data || []);
   renderAdmins();
 }
 
@@ -849,8 +849,8 @@ function renderAdmins() {
 }
 
 async function approveAdmin(id) {
-  const { error } = await sb.from('profiles').update({ approved: true }).eq('id', id);
-  if (error) { toast('승인 실패', 'error'); return; }
+  const { error } = await sb.rpc('admin_set_approved', { target_id: id, new_approved: true });
+  if (error) { toast('승인 실패: ' + error.message, 'error'); return; }
   toast('승인되었습니다');
   loadAdmins();
 }
@@ -858,16 +858,16 @@ async function approveAdmin(id) {
 async function changeRole(id, role) {
   const label = role === 'super_admin' ? '임원' : '일반회원';
   if (!confirm(`${label}로 변경하시겠습니까?`)) return;
-  const { error } = await sb.from('profiles').update({ role }).eq('id', id);
-  if (error) { toast('변경 실패', 'error'); return; }
+  const { error } = await sb.rpc('admin_set_role', { target_id: id, new_role: role });
+  if (error) { toast('변경 실패: ' + error.message, 'error'); return; }
   toast(`역할이 ${label}로 변경되었습니다`);
   loadAdmins();
 }
 
 async function deleteAdmin(id, name) {
   if (!confirm(`'${name}' 회원 계정을 탈퇴 처리하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) return;
-  const { error } = await sb.from('profiles').delete().eq('id', id);
-  if (error) { toast('삭제 실패', 'error'); return; }
+  const { error } = await sb.rpc('admin_delete_profile', { target_id: id });
+  if (error) { toast('삭제 실패: ' + error.message, 'error'); return; }
   toast('탈퇴 처리되었습니다');
   loadAdmins();
 }
