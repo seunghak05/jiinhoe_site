@@ -1,123 +1,202 @@
 -- ================================================
--- 지인회 관리자 시스템 — Supabase SQL 설정
--- Supabase 대시보드 > SQL Editor 에서 이 파일 전체를 실행하세요
+-- 지인회 관리자 시스템 — Supabase SQL 설정 (v2)
+-- Supabase 대시보드 > SQL Editor 에서 전체 실행
+-- 기존 데이터가 있어도 DROP 후 재생성하므로 안전합니다
 -- ================================================
 
--- 관리자 프로필 테이블
+-- ── 기존 함수 제거 ──
+drop function if exists public.get_my_profile() cascade;
+drop function if exists public.admin_get_profiles() cascade;
+drop function if exists public.admin_set_approved(uuid, boolean) cascade;
+drop function if exists public.admin_set_role(uuid, text) cascade;
+drop function if exists public.admin_delete_profile(uuid) cascade;
+drop function if exists public.handle_new_user() cascade;
+
+-- ── 기존 트리거 제거 ──
+drop trigger if exists on_auth_user_created on auth.users;
+
+-- ── 기존 테이블 제거 (순서 중요) ──
+drop table if exists public.gallery  cascade;
+drop table if exists public.dojangs  cascade;
+drop table if exists public.members  cascade;
+drop table if exists public.awards   cascade;
+drop table if exists public.settings cascade;
+drop table if exists public.profiles cascade;
+
+-- ── Storage 정책 제거 ──
+drop policy if exists "Public read gallery storage"   on storage.objects;
+drop policy if exists "Admins upload gallery storage" on storage.objects;
+drop policy if exists "Admins delete gallery storage" on storage.objects;
+drop policy if exists "Public gallery read"           on storage.objects;
+drop policy if exists "Auth gallery upload"           on storage.objects;
+drop policy if exists "Auth gallery delete"           on storage.objects;
+
+-- ================================================
+-- 테이블 생성
+-- ================================================
+
 create table public.profiles (
-  id uuid references auth.users on delete cascade primary key,
-  email text not null,
-  name text not null default '',
-  role text not null default 'admin' check (role in ('super_admin', 'admin')),
-  approved boolean not null default false,
+  id         uuid references auth.users on delete cascade primary key,
+  email      text not null,
+  name       text not null default '',
+  role       text not null default 'admin' check (role in ('super_admin', 'admin')),
+  approved   boolean not null default false,
   created_at timestamptz not null default now()
 );
 
--- 수상내역 테이블
 create table public.awards (
-  id bigserial primary key,
-  year int not null,
-  date text not null default '',
-  name text not null,
-  results text[] not null default '{}',
+  id         bigserial primary key,
+  year       int not null,
+  date       text not null default '',
+  name       text not null,
+  results    text[] not null default '{}',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
 
--- 회원명단 테이블
 create table public.members (
-  id bigserial primary key,
-  name text not null,
-  role_text text not null default '',
-  badge text not null default '',
+  id         bigserial primary key,
+  name       text not null,
+  role_text  text not null default '',
+  badge      text not null default '',
   sort_order int not null default 0
 );
 
--- 소속도장 테이블
 create table public.dojangs (
-  id bigserial primary key,
-  name text not null,
-  region text not null default '',
-  map_link text not null default '',
+  id         bigserial primary key,
+  name       text not null,
+  region     text not null default '',
+  map_link   text not null default '',
   sort_order int not null default 0
 );
 
--- 갤러리 테이블
 create table public.gallery (
-  id bigserial primary key,
-  url text not null,
-  caption text not null default '',
+  id         bigserial primary key,
+  url        text not null,
+  caption    text not null default '',
   sort_order int not null default 0,
   created_at timestamptz not null default now()
 );
 
--- 사이트 설정 테이블 (히어로 텍스트, 슬라이드쇼 등)
 create table public.settings (
-  key text primary key,
-  value text not null default '',
+  key        text primary key,
+  value      text not null default '',
   updated_at timestamptz not null default now()
 );
 
--- ── RLS 활성화 ──
-alter table public.settings enable row level security;
+-- ================================================
+-- RLS 활성화
+-- ================================================
+
 alter table public.profiles enable row level security;
-alter table public.awards enable row level security;
-alter table public.members enable row level security;
-alter table public.dojangs enable row level security;
-alter table public.gallery enable row level security;
+alter table public.awards   enable row level security;
+alter table public.members  enable row level security;
+alter table public.dojangs  enable row level security;
+alter table public.gallery  enable row level security;
+alter table public.settings enable row level security;
 
 -- ── 공개 읽기 정책 ──
-create policy "Public read settings" on public.settings for select using (true);
 create policy "Public read awards"   on public.awards   for select using (true);
 create policy "Public read members"  on public.members  for select using (true);
 create policy "Public read dojangs"  on public.dojangs  for select using (true);
 create policy "Public read gallery"  on public.gallery  for select using (true);
+create policy "Public read settings" on public.settings for select using (true);
 
--- ── 승인된 관리자 쓰기 정책 ──
+-- ── 프로필: 본인만 읽기/삽입 (임원 관리는 security definer 함수로) ──
+create policy "Users read own profile"   on public.profiles for select using (auth.uid() = id);
+create policy "Users insert own profile" on public.profiles for insert with check (auth.uid() = id);
+
+-- ── 콘텐츠 쓰기: 승인된 관리자 (security definer 함수로 profiles 조회 → 재귀 없음) ──
+create or replace function public.is_approved_admin()
+returns boolean language sql security definer stable as $$
+  select exists (select 1 from public.profiles where id = auth.uid() and approved = true)
+$$;
+
 create policy "Admins write settings" on public.settings for all
-  using (exists (select 1 from public.profiles where id = auth.uid() and approved = true))
-  with check (exists (select 1 from public.profiles where id = auth.uid() and approved = true));
+  using (public.is_approved_admin()) with check (public.is_approved_admin());
 
-create policy "Admins all awards" on public.awards for all
-  using (exists (select 1 from public.profiles where id = auth.uid() and approved = true))
-  with check (exists (select 1 from public.profiles where id = auth.uid() and approved = true));
+create policy "Admins all awards"   on public.awards  for all
+  using (public.is_approved_admin()) with check (public.is_approved_admin());
 
-create policy "Admins all members" on public.members for all
-  using (exists (select 1 from public.profiles where id = auth.uid() and approved = true))
-  with check (exists (select 1 from public.profiles where id = auth.uid() and approved = true));
+create policy "Admins all members"  on public.members for all
+  using (public.is_approved_admin()) with check (public.is_approved_admin());
 
-create policy "Admins all dojangs" on public.dojangs for all
-  using (exists (select 1 from public.profiles where id = auth.uid() and approved = true))
-  with check (exists (select 1 from public.profiles where id = auth.uid() and approved = true));
+create policy "Admins all dojangs"  on public.dojangs for all
+  using (public.is_approved_admin()) with check (public.is_approved_admin());
 
-create policy "Admins all gallery" on public.gallery for all
-  using (exists (select 1 from public.profiles where id = auth.uid() and approved = true))
-  with check (exists (select 1 from public.profiles where id = auth.uid() and approved = true));
+create policy "Admins all gallery"  on public.gallery for all
+  using (public.is_approved_admin()) with check (public.is_approved_admin());
 
--- ── 프로필 정책 ──
--- 본인 프로필 읽기
-create policy "Users read own profile" on public.profiles for select
-  using (auth.uid() = id);
+-- ================================================
+-- Security Definer 함수 (RLS 우회용)
+-- ================================================
 
--- 임원 전체 프로필 읽기
-create policy "Super admin read all profiles" on public.profiles for select
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'super_admin'));
+-- 내 프로필 조회 (로그인 확인용)
+create or replace function public.get_my_profile()
+returns json language plpgsql security definer as $$
+declare r record;
+begin
+  select id, email, name, role, approved into r
+  from public.profiles where id = auth.uid();
+  if not found then return null; end if;
+  return row_to_json(r);
+end;
+$$;
 
--- 임원 프로필 수정 (승인/역할 변경)
-create policy "Super admin update profiles" on public.profiles for update
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'super_admin'));
+-- 임원: 전체 회원 목록 조회
+create or replace function public.admin_get_profiles()
+returns setof public.profiles language plpgsql security definer as $$
+begin
+  if not exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'super_admin' and approved = true
+  ) then raise exception 'Forbidden'; end if;
+  return query select * from public.profiles order by approved, created_at;
+end;
+$$;
 
--- 임원 프로필 삭제
-create policy "Super admin delete profiles" on public.profiles for delete
-  using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'super_admin'));
+-- 임원: 승인 처리
+create or replace function public.admin_set_approved(target_id uuid, new_approved boolean)
+returns void language plpgsql security definer as $$
+begin
+  if not exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'super_admin' and approved = true
+  ) then raise exception 'Forbidden'; end if;
+  update public.profiles set approved = new_approved where id = target_id;
+end;
+$$;
 
--- 회원가입 시 본인 프로필 생성
-create policy "Users insert own profile" on public.profiles for insert
-  with check (auth.uid() = id);
+-- 임원: 역할 변경
+create or replace function public.admin_set_role(target_id uuid, new_role text)
+returns void language plpgsql security definer as $$
+begin
+  if not exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'super_admin' and approved = true
+  ) then raise exception 'Forbidden'; end if;
+  update public.profiles set role = new_role where id = target_id;
+end;
+$$;
 
--- ── 회원가입 시 프로필 자동 생성 트리거 ──
+-- 임원: 회원 삭제
+create or replace function public.admin_delete_profile(target_id uuid)
+returns void language plpgsql security definer as $$
+begin
+  if not exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'super_admin' and approved = true
+  ) then raise exception 'Forbidden'; end if;
+  delete from public.profiles where id = target_id;
+end;
+$$;
+
+-- ================================================
+-- 회원가입 시 프로필 자동 생성 트리거
+-- ================================================
+
 create or replace function public.handle_new_user()
-returns trigger as $$
+returns trigger language plpgsql security definer as $$
 declare
   cnt int;
 begin
@@ -132,34 +211,31 @@ begin
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$;
 
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- ── 갤러리 Storage 버킷 ──
+-- ================================================
+-- Storage 버킷 및 정책
+-- ================================================
+
 insert into storage.buckets (id, name, public)
 values ('gallery', 'gallery', true)
-on conflict (id) do nothing;
+on conflict (id) do update set public = true;
 
-create policy "Public read gallery storage" on storage.objects
+create policy "Public gallery read" on storage.objects
   for select using (bucket_id = 'gallery');
 
-create policy "Admins upload gallery storage" on storage.objects
-  for insert with check (
-    bucket_id = 'gallery' and
-    exists (select 1 from public.profiles where id = auth.uid() and approved = true)
-  );
+create policy "Auth gallery upload" on storage.objects
+  for insert with check (bucket_id = 'gallery' and auth.uid() is not null);
 
-create policy "Admins delete gallery storage" on storage.objects
-  for delete using (
-    bucket_id = 'gallery' and
-    exists (select 1 from public.profiles where id = auth.uid() and approved = true)
-  );
+create policy "Auth gallery delete" on storage.objects
+  for delete using (bucket_id = 'gallery' and auth.uid() is not null);
 
 -- ================================================
--- 기존 데이터 시드 (seed data)
+-- 기본 데이터 (seed data)
 -- ================================================
 
 -- 사이트 설정 기본값
@@ -178,7 +254,7 @@ insert into public.members (name, role_text, badge, sort_order) values
   ('김민화', '용인대마스터태권도 관장', '', 2),
   ('박미선', '군산시', '', 3),
   ('김수일', '원광대학교', '', 4),
-  ('장명진', '프리랜서 지도자 · 팀어게인 전주점', '', 5),
+  ('장명진', '프리랜서 지도자·팀어게인 전주점', '', 5),
   ('이진규', '평화 효자태권도장 관장', '', 6),
   ('조광익', '히어로키즈태권도장 관장', '', 7),
   ('김 선', '정읍시', '', 8),
@@ -191,15 +267,15 @@ insert into public.members (name, role_text, badge, sort_order) values
 
 -- 소속도장
 insert into public.dojangs (name, region, map_link, sort_order) values
-  ('삼례경희대태권도장',  '완주군', 'https://naver.me/xDJdm8kY', 1),
+  ('삼례경희대태권도장',   '완주군', 'https://naver.me/xDJdm8kY', 1),
   ('송천 효경석사 태권도', '전주시', 'https://naver.me/GlJBEbJL', 2),
-  ('팀 어게인 전주점',    '전주시', 'https://naver.me/xS1QIpVn', 3),
+  ('팀 어게인 전주점',     '전주시', 'https://naver.me/xS1QIpVn', 3),
   ('용인대마스터태권도',   '전주시', 'https://naver.me/5zX5EsYT', 4),
-  ('찬빛태권도장',        '진안군', 'https://naver.me/FqWACESi', 5),
-  ('탑클래스태권도장',    '전주시', 'https://naver.me/FMce94en', 6),
-  ('태양태권도',          '군산시', 'https://naver.me/G7VmbQgB', 7),
-  ('평화 효자태권도장',   '전주시', 'https://naver.me/FUQyNTtn', 8),
-  ('히어로키즈태권도장',  '군산시', 'https://naver.me/xUwPQiXf', 9);
+  ('찬빛태권도장',         '진안군', 'https://naver.me/FqWACESi', 5),
+  ('탑클래스태권도장',     '전주시', 'https://naver.me/FMce94en', 6),
+  ('태양태권도',           '군산시', 'https://naver.me/G7VmbQgB', 7),
+  ('평화 효자태권도장',    '전주시', 'https://naver.me/FUQyNTtn', 8),
+  ('히어로키즈태권도장',   '군산시', 'https://naver.me/xUwPQiXf', 9);
 
 -- 갤러리 (기존 로컬 이미지)
 insert into public.gallery (url, caption, sort_order) values
@@ -221,7 +297,7 @@ insert into public.gallery (url, caption, sort_order) values
   ('img/13.jpg', '정기수련', 16),
   ('img/14.jpg', '정기수련', 17);
 
--- 수상내역 (최근 데이터)
+-- 수상내역
 insert into public.awards (year, date, name, results, sort_order) values
 (2026, '3월 16일', '2026 전국종별선수권대회', ARRAY['남자 지태 1부 3위: 조명성'], 1),
 (2026, '2월 25일~28일', '2026년도 국가대표 선발전 아시아·세계선수권', ARRAY['아시아선수권대회 1위: 장명진','세계선수권대회 4위: 김민화'], 2),
@@ -262,9 +338,7 @@ insert into public.awards (year, date, name, results, sort_order) values
 
 -- ================================================
 -- 최초 임원 설정 방법
--- 1. login.html 에서 관리자 계정 회원가입
--- 2. Supabase 대시보드 > Authentication > Users 에서 해당 이메일 확인
--- 3. 아래 SQL 에서 이메일을 실제 이메일로 변경 후 실행:
--- UPDATE public.profiles SET role = 'super_admin', approved = true
--- WHERE email = '여기에_임원_이메일_입력';
+-- 1. login.html 에서 계정 회원가입
+-- 2. 아래 이메일을 실제 이메일로 바꿔서 실행:
+-- UPDATE public.profiles SET role = 'super_admin', approved = true WHERE email = '여기에_이메일_입력';
 -- ================================================

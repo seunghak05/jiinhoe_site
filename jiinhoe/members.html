@@ -193,6 +193,10 @@ async function initMembers() {
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const { data, error } = await sb.from('members').select('*').order('sort_order').order('id');
     if (error || !data || !data.length) { useFallbackMembers(); return; }
+    for (let i = data.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [data[i], data[j]] = [data[j], data[i]];
+    }
     const grid = document.querySelector('.mem-grid');
     grid.innerHTML = data.map(m => `
       <div class="mem-card">
