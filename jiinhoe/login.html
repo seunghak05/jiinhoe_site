@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>관리자 로그인 | 지인회 (志人會)</title>
+<title>로그인 및 회원가입 | 지인회 (志人會)</title>
 <link rel="icon" href="img/favicon.ico/apple-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -247,7 +247,7 @@ body {
   <div id="panel-pending">
     <div class="pending-icon">⏳</div>
     <p class="pending-title">승인 대기 중</p>
-    <p class="pending-desc">가입 신청이 완료되었습니다.<br>최고관리자의 승인 후 관리자 패널에 접근할 수 있습니다.</p>
+    <p class="pending-desc">가입 신청이 완료되었습니다.<br>임원의 승인 후 관리자 패널에 접근할 수 있습니다.</p>
     <button class="pending-logout" onclick="doLogout()">로그아웃</button>
   </div>
 
@@ -292,7 +292,13 @@ async function doLogin(e) {
   }
 
   // 승인 여부 확인
-  const { data: profile } = await sb.from('profiles').select('approved, role').eq('id', data.user.id).single();
+  const { data: profile, error: pErr } = await sb.from('profiles').select('approved, role').eq('id', data.user.id).single();
+  if (pErr) {
+    showMsg('프로필 오류: ' + pErr.message + ' (code: ' + pErr.code + ')', 'error');
+    btn.disabled = false;
+    btn.textContent = '로그인';
+    return;
+  }
   if (!profile || !profile.approved) {
     document.getElementById('panel-form').style.display = 'none';
     document.getElementById('panel-pending').classList.add('show');
@@ -324,7 +330,7 @@ async function doSignup(e) {
     return;
   }
 
-  showMsg('가입 신청이 완료되었습니다. 최고관리자의 승인 후 로그인하실 수 있습니다.', 'success');
+  showMsg('가입 신청이 완료되었습니다. 임원의 승인 후 로그인하실 수 있습니다.', 'success');
   document.getElementById('form-signup').reset();
   btn.disabled = false;
   btn.textContent = '가입 신청';

@@ -99,15 +99,15 @@ create policy "Admins all gallery" on public.gallery for all
 create policy "Users read own profile" on public.profiles for select
   using (auth.uid() = id);
 
--- 최고관리자 전체 프로필 읽기
+-- 임원 전체 프로필 읽기
 create policy "Super admin read all profiles" on public.profiles for select
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'super_admin'));
 
--- 최고관리자 프로필 수정 (승인/역할 변경)
+-- 임원 프로필 수정 (승인/역할 변경)
 create policy "Super admin update profiles" on public.profiles for update
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'super_admin'));
 
--- 최고관리자 프로필 삭제
+-- 임원 프로필 삭제
 create policy "Super admin delete profiles" on public.profiles for delete
   using (exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'super_admin'));
 
@@ -118,12 +118,17 @@ create policy "Users insert own profile" on public.profiles for insert
 -- ── 회원가입 시 프로필 자동 생성 트리거 ──
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  cnt int;
 begin
-  insert into public.profiles (id, email, name)
+  select count(*) into cnt from public.profiles where approved = true;
+  insert into public.profiles (id, email, name, role, approved)
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'name', '')
+    coalesce(new.raw_user_meta_data->>'name', ''),
+    case when cnt = 0 then 'super_admin' else 'admin' end,
+    cnt = 0
   );
   return new;
 end;
@@ -256,10 +261,10 @@ insert into public.awards (year, date, name, results, sort_order) values
 (2020, '7월 22일', '제13회 세계태권도문화엑스포', ARRAY['단체전 3위 (김민화, 박미선, 김동현)'], 36);
 
 -- ================================================
--- 최초 최고관리자 설정 방법
+-- 최초 임원 설정 방법
 -- 1. login.html 에서 관리자 계정 회원가입
 -- 2. Supabase 대시보드 > Authentication > Users 에서 해당 이메일 확인
 -- 3. 아래 SQL 에서 이메일을 실제 이메일로 변경 후 실행:
 -- UPDATE public.profiles SET role = 'super_admin', approved = true
--- WHERE email = '여기에_최고관리자_이메일_입력';
+-- WHERE email = '여기에_임원_이메일_입력';
 -- ================================================
