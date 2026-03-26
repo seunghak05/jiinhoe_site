@@ -57,7 +57,8 @@
 <section class="sec sec-dark">
   <div class="wrap">
     <div class="filter-bar rv" id="af">
-      <button class="fb on" data-y="2025">2025년</button>
+      <button class="fb on" data-y="2026">2026년</button>
+      <button class="fb" data-y="2025">2025년</button>
       <button class="fb" data-y="2024">2024년</button>
       <button class="fb" data-y="2023">2023년</button>
       <button class="fb" data-y="2022">2022년</button>
@@ -85,6 +86,7 @@
 <script src="common.js"></script>
 <script>
 const AD = [
+  {y:2026,d:'3월 16일', n:'2026 전국종별선수권대회',                        r:['🥉 남자 지태 1부 3위: 조명성']},
   {y:2025,d:'11월 1일',  n:'제22회 대한태권도협회장배 대회',                  r:['🥇 태백 2부 여 개인전 1위: 장명진','🥈 장년 2부 페어 2위: 이진규, 김민화','🥉 천권부 남 개인전 3위: 이진규']},
   {y:2025,d:'8월 8일',   n:'제60회 대통령기 전국단체대항태권도대회',          r:['🥇 태백 2부 여 1위: 장명진','🥈 금강 2부 여 2위: 유향미','🥉 천권부 남 3위: 이진규']},
   {y:2025,d:'7월 26일',  n:'제11회 태권도원배 전국태권도선수권대회',          r:['🥉 천권부 여자 3위: 박미선']},
@@ -143,7 +145,7 @@ afBtns.forEach(b => b.addEventListener('click', () => {
   b.classList.add('on');
   renderAwards(b.dataset.y === 'all' ? AD : AD.filter(a => a.y == b.dataset.y));
 }));
-renderAwards(AD.filter(a => a.y === 2025));
+renderAwards(AD.filter(a => a.y === 2026));
 </script>
 </body>
 </html>
