@@ -640,10 +640,15 @@ async function loadGallery() {
   }
   grid.innerHTML = allGallery.map(g => `
     <div class="ad-gallery-item">
-      <img src="${escAttr(g.url)}" alt="${escAttr(g.caption)}" loading="lazy" onerror="this.style.opacity='.2'">
-      <div class="ad-gallery-item-cap">${g.caption}</div>
-      <div class="ad-gallery-item-actions">
-        <button class="btn btn-danger" onclick="deleteGallery(${g.id})">삭제</button>
+      <div class="ad-gallery-item-thumb">
+        <img src="${escAttr(g.url)}" alt="${escAttr(g.caption)}" loading="lazy" onerror="this.style.opacity='.15'">
+      </div>
+      <div class="ad-gallery-item-footer">
+        <span class="ad-gallery-item-cap" title="${escAttr(g.caption)}">${g.caption || '—'}</span>
+        <div class="ad-gallery-item-actions">
+          <button class="btn btn-outline" style="font-size:.7rem;padding:.25rem .55rem" onclick="openGalleryEditModal(${g.id})">수정</button>
+          <button class="btn btn-danger" style="font-size:.7rem;padding:.25rem .55rem" onclick="deleteGallery(${g.id})">삭제</button>
+        </div>
       </div>
     </div>
   `).join('');
@@ -652,46 +657,24 @@ async function loadGallery() {
 function openGalleryModal() {
   openModal('사진 추가', `
     <div class="ad-form">
-      <p style="font-size:.78rem;color:var(--dim);line-height:1.7;margin-bottom:1rem">
-        Supabase Storage에 이미지를 업로드하거나 외부 이미지 URL을 직접 입력할 수 있습니다.
-      </p>
-
-      <div class="ad-form-group">
-        <label class="ad-form-label">이미지 업로드</label>
-        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('gallery-file').click()">
-          <input type="file" id="gallery-file" accept="image/*" multiple onchange="handleFileSelect(event)">
-          <div class="upload-zone-txt">
-            <strong>클릭하여 이미지 선택</strong><br>
-            JPG, PNG, WebP 지원 · 여러 파일 동시 선택 가능
-          </div>
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('gallery-file').click()">
+        <input type="file" id="gallery-file" accept="image/*" multiple onchange="handleFileSelect(event)">
+        <div class="upload-zone-txt">
+          <strong>클릭하여 이미지 선택</strong><br>
+          JPG, PNG, WebP · 여러 장 동시 선택 가능
         </div>
-        <div id="upload-preview" style="display:none;margin-top:.8rem">
-          <p style="font-size:.72rem;color:var(--dim);margin-bottom:.4rem" id="upload-count"></p>
-          <div id="upload-thumb-list" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
-        </div>
-        <button type="button" class="btn btn-primary" id="btn-upload" onclick="uploadFiles()" style="display:none;margin-top:.6rem">업로드 시작</button>
       </div>
-
-      <div style="text-align:center;font-size:.72rem;color:var(--dim);margin:.5rem 0">또는</div>
-
-      <form class="ad-form" onsubmit="saveGalleryUrl(event)">
-        <div class="ad-form-group">
-          <label class="ad-form-label">이미지 URL 직접 입력</label>
-          <input class="ad-form-input" type="url" id="gal-url" placeholder="https://...">
-        </div>
-        <div class="ad-form-group">
-          <label class="ad-form-label">캡션</label>
-          <input class="ad-form-input" type="text" id="gal-cap" placeholder="정기수련">
-        </div>
-        <div class="ad-form-group">
-          <label class="ad-form-label">표시 순서</label>
-          <input class="ad-form-input" type="number" id="gal-order" value="${allGallery.length + 1}" min="0">
-        </div>
-        <div class="ad-form-actions">
+      <div id="upload-preview" style="display:none;margin-top:1rem">
+        <p style="font-size:.72rem;color:var(--dim);margin-bottom:.8rem" id="upload-count"></p>
+        <div id="upload-thumb-list" style="display:flex;flex-direction:column;gap:.6rem"></div>
+        <div class="ad-form-actions" style="margin-top:1rem">
           <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
-          <button type="submit" class="btn btn-primary">URL로 추가</button>
+          <button type="button" class="btn btn-primary" id="btn-upload" onclick="uploadFiles()">업로드</button>
         </div>
-      </form>
+      </div>
+      <div id="upload-empty-actions" style="margin-top:1rem">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+      </div>
     </div>
   `);
 
@@ -714,19 +697,24 @@ let selectedFiles = [];
 function handleFileSelect(e) {
   selectedFiles = [...e.target.files];
   if (!selectedFiles.length) return;
-  document.getElementById('upload-count').textContent = `${selectedFiles.length}개 파일 선택됨`;
-  document.getElementById('upload-thumb-list').innerHTML = selectedFiles.map((f, i) =>
-    `<div style="width:60px;height:60px;background:#222;position:relative;overflow:hidden">
-      <img id="thumb-${i}" style="width:100%;height:100%;object-fit:cover">
-    </div>`
-  ).join('');
+  document.getElementById('upload-count').textContent = `${selectedFiles.length}개 파일 선택됨 — 각 사진 이름을 입력해주세요`;
+  document.getElementById('upload-thumb-list').innerHTML = selectedFiles.map((f, i) => {
+    const defaultName = f.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+    return `<div style="display:flex;align-items:center;gap:.8rem;background:var(--mid);padding:.6rem .8rem">
+      <img id="thumb-${i}" style="width:64px;height:48px;object-fit:cover;flex-shrink:0;background:#333">
+      <div style="flex:1">
+        <p style="font-size:.7rem;color:var(--dim);margin-bottom:.3rem">${f.name}</p>
+        <input class="ad-form-input" id="caption-${i}" type="text" value="${defaultName}" placeholder="사진 이름 (예: 정기수련, 대회)" style="margin:0;padding:.4rem .6rem;font-size:.8rem">
+      </div>
+    </div>`;
+  }).join('');
   selectedFiles.forEach((f, i) => {
     const r = new FileReader();
     r.onload = ev => { const el = document.getElementById('thumb-' + i); if (el) el.src = ev.target.result; };
     r.readAsDataURL(f);
   });
   document.getElementById('upload-preview').style.display = 'block';
-  document.getElementById('btn-upload').style.display = 'inline-flex';
+  document.getElementById('upload-empty-actions').style.display = 'none';
 }
 
 async function uploadFiles() {
@@ -735,13 +723,15 @@ async function uploadFiles() {
   btn.disabled = true;
   btn.textContent = '업로드 중...';
   let success = 0;
-  for (const file of selectedFiles) {
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    const captionEl = document.getElementById('caption-' + i);
+    const caption = captionEl ? captionEl.value.trim() || file.name : file.name;
     const ext = file.name.split('.').pop();
     const path = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
     const { error: upErr } = await sb.storage.from('gallery').upload(path, file);
     if (upErr) { toast(`업로드 실패: ${file.name}`, 'error'); continue; }
     const { data: { publicUrl } } = sb.storage.from('gallery').getPublicUrl(path);
-    const caption = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
     const { error: dbErr } = await sb.from('gallery').insert({
       url: publicUrl,
       caption,
@@ -754,18 +744,37 @@ async function uploadFiles() {
   loadGallery();
 }
 
-async function saveGalleryUrl(e) {
+function openGalleryEditModal(id) {
+  const g = allGallery.find(x => x.id === id);
+  if (!g) return;
+  openModal('사진 수정', `
+    <form class="ad-form" onsubmit="saveGalleryEdit(event, ${id})">
+      <div style="margin-bottom:1rem;aspect-ratio:3/2;overflow:hidden;background:var(--black)">
+        <img src="${escAttr(g.url)}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.opacity='.15'">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">사진 이름</label>
+        <input class="ad-form-input" type="text" id="edit-caption" value="${escHtml(g.caption)}" placeholder="예: 정기수련, 대회">
+      </div>
+      <div class="ad-form-group">
+        <label class="ad-form-label">표시 순서</label>
+        <input class="ad-form-input" type="number" id="edit-order" value="${g.sort_order || 0}" min="0">
+      </div>
+      <div class="ad-form-actions">
+        <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+        <button type="submit" class="btn btn-primary">저장</button>
+      </div>
+    </form>
+  `);
+}
+
+async function saveGalleryEdit(e, id) {
   e.preventDefault();
-  const url = document.getElementById('gal-url').value.trim();
-  if (!url) return;
-  const payload = {
-    url,
-    caption:    document.getElementById('gal-cap').value.trim(),
-    sort_order: parseInt(document.getElementById('gal-order').value) || 0,
-  };
-  const { error } = await sb.from('gallery').insert(payload);
-  if (error) { toast('추가 실패: ' + error.message, 'error'); return; }
-  toast('사진이 추가되었습니다');
+  const caption    = document.getElementById('edit-caption').value.trim();
+  const sort_order = parseInt(document.getElementById('edit-order').value) || 0;
+  const { error } = await sb.from('gallery').update({ caption, sort_order }).eq('id', id);
+  if (error) { toast('저장 실패: ' + error.message, 'error'); return; }
+  toast('사진 정보가 수정되었습니다');
   closeModal();
   loadGallery();
 }
@@ -1014,25 +1023,14 @@ function formatDate(iso) {
   return new Date(iso).toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
 }
 
-/* ── 자동 로그아웃 (1시간 비활동) ── */
-const AUTO_LOGOUT_MS = 60 * 60 * 1000;
-let autoLogoutTimer;
-
-function resetAutoLogout() {
-  clearTimeout(autoLogoutTimer);
-  autoLogoutTimer = setTimeout(async () => {
-    await sb.auth.signOut();
-    window.location.href = 'login.html';
-  }, AUTO_LOGOUT_MS);
-}
-
-['mousemove','keydown','click','scroll','touchstart'].forEach(ev =>
-  document.addEventListener(ev, resetAutoLogout, { passive: true })
-);
+/* ── 자동 로그아웃 (2시간 후 고정) ── */
+setTimeout(async () => {
+  await sb.auth.signOut();
+  window.location.href = 'login.html';
+}, 2 * 60 * 60 * 1000);
 
 /* ── 시작 ── */
 initAdmin();
-resetAutoLogout();
 </script>
 </body>
 </html>
