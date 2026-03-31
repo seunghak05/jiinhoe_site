@@ -248,6 +248,7 @@
   font-size:.84rem; color:rgba(248,247,243,.45);
   font-weight:400; line-height:1.7; max-width:320px;
   margin-bottom:1.4rem;
+  min-height:calc(0.84rem * 1.7 * 2);
 }
 .hm-card-arrow {
   display:inline-flex; align-items:center; gap:.5rem;
@@ -371,7 +372,7 @@
   <div class="wrap">
     <div class="hm-header rv">
       <p class="hm-header-label">Pages</p>
-      <h2 class="hm-header-title">지인회를 만나보세요</h2>
+      <h2 class="hm-header-title" id="menu-title">지인회를 만나보세요</h2>
     </div>
 
     <div class="hm-grid-top rv" style="transition-delay:.1s">
@@ -550,9 +551,10 @@
     if(error||!data) return;
     const s={};
     data.forEach(r=>{ s[r.key]=r.value; });
+    if(s.menu_title)   document.getElementById('menu-title').textContent=s.menu_title;
     if(s.hero_thin)    document.getElementById('hero-thin').textContent=s.hero_thin;
     if(s.hero_red)     document.getElementById('hero-red').textContent=s.hero_red;
-    if(s.hero_sub)     document.getElementById('hero-sub').innerHTML=s.hero_sub.replace(/\n/g,'<br>');
+    if(s.hero_sub)     document.getElementById('hero-sub').innerHTML=s.hero_sub.replace(/\\n|\n/g,'<br>');
     if(s.hero_cta)     document.getElementById('hero-cta-txt').textContent=s.hero_cta;
     if(s.hero_slideshow){
       try{

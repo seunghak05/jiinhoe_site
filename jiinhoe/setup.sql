@@ -240,6 +240,7 @@ create policy "Auth gallery delete" on storage.objects
 
 -- 사이트 설정 기본값
 insert into public.settings (key, value) values
+  ('menu_title',      '지인회를 만나보세요'),
   ('hero_thin',       '뜻을 모아'),
   ('hero_red',        '한계를 깎다'),
   ('hero_sub',        '지인회(志人會)는 전북특별자치도 태권도 품새 전문 선수단입니다.\n체계적인 훈련과 단합된 팀워크를 바탕으로 실력을 증명해 나갑니다.'),

@@ -159,7 +159,16 @@
         <button class="btn btn-primary" onclick="saveSettings()">저장</button>
       </div>
 
-      <p class="ad-section-title">히어로 문구</p>
+      <p class="ad-section-title">메인 섹션 문구</p>
+      <div class="ad-form" style="max-width:560px">
+        <div class="ad-form-group">
+          <label class="ad-form-label">「지인회를 만나보세요」 제목</label>
+          <input class="ad-form-input" type="text" id="st-menu-title" placeholder="지인회를 만나보세요">
+          <span class="ad-form-hint">메인 페이지 카드 섹션 상단 제목</span>
+        </div>
+      </div>
+
+      <p class="ad-section-title" style="margin-top:2rem">히어로 문구</p>
       <div class="ad-form" style="max-width:560px">
         <div class="ad-form-group">
           <label class="ad-form-label">첫째 줄 (얇은 글씨)</label>
@@ -909,6 +918,7 @@ async function loadSettings() {
   (data || []).forEach(r => { siteSettings[r.key] = r.value; });
 
   // 폼 채우기
+  document.getElementById('st-menu-title').value = siteSettings.menu_title || '지인회를 만나보세요';
   document.getElementById('st-thin').value  = siteSettings.hero_thin    || '뜻을 모아';
   document.getElementById('st-red').value   = siteSettings.hero_red     || '한계를 깎다';
   document.getElementById('st-sub').value   = siteSettings.hero_sub     || '';
@@ -1013,6 +1023,7 @@ function moveSlide(i, dir) {
 
 async function saveSettings() {
   const updates = [
+    { key: 'menu_title',     value: document.getElementById('st-menu-title').value.trim() },
     { key: 'hero_thin',      value: document.getElementById('st-thin').value.trim()  },
     { key: 'hero_red',       value: document.getElementById('st-red').value.trim()   },
     { key: 'hero_sub',       value: document.getElementById('st-sub').value.trim()   },
