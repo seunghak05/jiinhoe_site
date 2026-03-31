@@ -182,7 +182,7 @@
 }
 
 /* ── HOME CARDS (섹션 메뉴) ── */
-#home-menu { background:var(--white); }
+#home-menu { background:var(--white); padding-top:7rem; }
 .hm-header { margin-bottom:4rem; }
 .hm-header-label {
   font-family:var(--disp); font-style:italic;
@@ -208,7 +208,7 @@
   background:var(--dark); display:block;
 }
 .hm-card-top    { aspect-ratio:3/2; }
-.hm-card-bottom { aspect-ratio:4/3; }
+.hm-card-bottom { aspect-ratio:1/1; }
 
 .hm-card-bg {
   position:absolute; inset:0;
@@ -232,6 +232,7 @@
   color:rgba(255,255,255,.07); margin-bottom:auto;
 }
 .hm-card-bottom .hm-card-num { font-size:3.5rem; }
+.hm-card-bottom .hm-card-body { padding:2rem 1.8rem 2.2rem; }
 .hm-card-en {
   font-family:var(--disp); font-style:italic;
   font-size:.75rem; color:rgba(248,247,243,.4); letter-spacing:.3em;
@@ -560,6 +561,11 @@
           IMGS=imgs;
         }
       }catch(_){}
+    }
+    if(s.instagram_url){
+      document.querySelectorAll('.ft-insta-link,.nav-insta-link').forEach(function(a){a.href=s.instagram_url;});
+      var card=document.getElementById('hm-insta-card');
+      if(card) card.href=s.instagram_url;
     }
   }catch(_){}
 })();

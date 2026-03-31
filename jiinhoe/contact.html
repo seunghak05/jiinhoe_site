@@ -185,7 +185,7 @@
   try {
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const { data } = await sb.from('settings').select('key,value')
-      .in('key', ['contact_phone','contact_org','contact_join_title','contact_join_desc']);
+      .in('key', ['contact_phone','contact_org','contact_join_title','contact_join_desc','instagram_url']);
     if (!data) return;
     const s = {};
     data.forEach(r => { s[r.key] = r.value; });
@@ -202,6 +202,9 @@
     }
     if (s.contact_join_desc) {
       document.getElementById('ct-join-desc').textContent = s.contact_join_desc;
+    }
+    if (s.instagram_url) {
+      document.querySelectorAll('.ft-insta-link,.nav-insta-link').forEach(function(a){a.href=s.instagram_url;});
     }
   } catch(_) {}
 })();

@@ -143,5 +143,17 @@
 <script src="supabase-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="common.js"></script>
+<script>
+(async function(){
+  if(typeof SUPABASE_CONFIGURED==='undefined'||!SUPABASE_CONFIGURED) return;
+  try{
+    var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+    var res=await sb.from('settings').select('value').eq('key','instagram_url');
+    if(!res.data||!res.data.length||!res.data[0].value) return;
+    var url=res.data[0].value;
+    document.querySelectorAll('.ft-insta-link,.nav-insta-link').forEach(function(a){a.href=url;});
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

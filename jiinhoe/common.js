@@ -35,9 +35,9 @@
     if (typeof window.supabase === 'undefined') return;
     try {
       const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      const { data } = await sb.from('settings').select('value').eq('key', 'instagram_url').single();
-      if (!data || !data.value) return;
-      const url = data.value;
+      const { data } = await sb.from('settings').select('value').eq('key', 'instagram_url');
+      if (!data || !data.length || !data[0].value) return;
+      const url = data[0].value;
       /* 푸터 링크 */
       document.querySelectorAll('.ft-insta-link').forEach(function (a) {
         a.href = url; a.style.display = 'inline-flex';
