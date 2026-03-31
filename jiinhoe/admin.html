@@ -154,7 +154,7 @@
       <div class="panel-head">
         <div>
           <h2 class="panel-title">사이트 설정</h2>
-          <p class="panel-subtitle">메인 페이지 히어로 문구와 배경 슬라이드쇼를 관리합니다</p>
+          <p class="panel-subtitle">히어로 문구, SNS 링크, 문의 내용, 슬라이드쇼를 관리합니다</p>
         </div>
         <button class="btn btn-primary" onclick="saveSettings()">저장</button>
       </div>
@@ -190,6 +190,23 @@
           <label class="ad-form-label">기관명</label>
           <input class="ad-form-input" type="text" id="st-org" placeholder="용인대 마스터 태권도">
           <span class="ad-form-hint">문의 페이지에 표시되는 소속 기관명</span>
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">인스타그램 URL</label>
+          <input class="ad-form-input" type="url" id="st-insta" placeholder="https://www.instagram.com/jiinhoe">
+          <span class="ad-form-hint">입력 시 모든 페이지 푸터에 인스타그램 링크가 표시됩니다. 비워두면 숨겨집니다.</span>
+        </div>
+      </div>
+
+      <p class="ad-section-title" style="margin-top:2rem">입단 문의 (contact 페이지 Join 섹션)</p>
+      <div class="ad-form" style="max-width:560px">
+        <div class="ad-form-group">
+          <label class="ad-form-label">제목</label>
+          <input class="ad-form-input" type="text" id="st-join-title" placeholder="입단 문의">
+        </div>
+        <div class="ad-form-group">
+          <label class="ad-form-label">내용</label>
+          <textarea class="ad-form-textarea" id="st-join-desc" rows="4" placeholder="지인회에 합류하고 싶으신 분..."></textarea>
         </div>
       </div>
 
@@ -896,8 +913,11 @@ async function loadSettings() {
   document.getElementById('st-red').value   = siteSettings.hero_red     || '한계를 깎다';
   document.getElementById('st-sub').value   = siteSettings.hero_sub     || '';
   document.getElementById('st-cta').value   = siteSettings.hero_cta     || '지인회 소개';
-  document.getElementById('st-phone').value = siteSettings.contact_phone || '0507-1448-7577';
-  document.getElementById('st-org').value   = siteSettings.contact_org   || '용인대 마스터 태권도';
+  document.getElementById('st-phone').value      = siteSettings.contact_phone      || '0507-1448-7577';
+  document.getElementById('st-org').value        = siteSettings.contact_org        || '용인대 마스터 태권도';
+  document.getElementById('st-insta').value      = siteSettings.instagram_url      || '';
+  document.getElementById('st-join-title').value = siteSettings.contact_join_title || '입단 문의';
+  document.getElementById('st-join-desc').value  = siteSettings.contact_join_desc  || '지인회에 합류하고 싶으신 분, 태권도 품새를 함께 수련하고 싶으신 분은 편하게 연락 주세요. 현재 도장 소속, 단증 여부 등을 말씀해 주시면 안내해 드립니다.';
 
   // 슬라이드쇼 이미지 목록
   try {
@@ -998,8 +1018,11 @@ async function saveSettings() {
     { key: 'hero_sub',       value: document.getElementById('st-sub').value.trim()   },
     { key: 'hero_cta',       value: document.getElementById('st-cta').value.trim()   },
     { key: 'hero_slideshow', value: JSON.stringify(slideImages)                       },
-    { key: 'contact_phone',  value: document.getElementById('st-phone').value.trim() },
-    { key: 'contact_org',    value: document.getElementById('st-org').value.trim()   },
+    { key: 'contact_phone',      value: document.getElementById('st-phone').value.trim()      },
+    { key: 'contact_org',        value: document.getElementById('st-org').value.trim()        },
+    { key: 'instagram_url',      value: document.getElementById('st-insta').value.trim()      },
+    { key: 'contact_join_title', value: document.getElementById('st-join-title').value.trim() },
+    { key: 'contact_join_desc',  value: document.getElementById('st-join-desc').value.trim()  },
   ];
 
   for (const row of updates) {

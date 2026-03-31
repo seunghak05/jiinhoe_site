@@ -29,6 +29,33 @@
     ftCopy.textContent = '© ' + new Date().getFullYear() + ' 지인회 (志人會). All rights reserved.';
   }
 
+  /* 인스타그램 링크 동적 로드 */
+  (async function () {
+    if (typeof SUPABASE_CONFIGURED === 'undefined' || !SUPABASE_CONFIGURED) return;
+    if (typeof window.supabase === 'undefined') return;
+    try {
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data } = await sb.from('settings').select('value').eq('key', 'instagram_url').single();
+      if (!data || !data.value) return;
+      const url = data.value;
+      /* 푸터 링크 */
+      document.querySelectorAll('.ft-insta-link').forEach(function (a) {
+        a.href = url; a.style.display = 'inline-flex';
+      });
+      /* 네비게이션 링크 */
+      document.querySelectorAll('.nav-insta-link').forEach(function (a) {
+        a.href = url; a.style.display = 'inline-flex';
+      });
+      /* 홈 카드 (index.html) */
+      var card = document.getElementById('hm-insta-card');
+      if (card) {
+        card.href = url; card.style.display = 'block';
+        var grid = card.parentElement;
+        if (grid) grid.classList.add('has-insta');
+      }
+    } catch (_) {}
+  })();
+
   /* 스크롤 reveal */
   const ro = new IntersectionObserver(function (entries) {
     entries.forEach(function (e) {

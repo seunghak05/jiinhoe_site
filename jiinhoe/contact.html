@@ -106,6 +106,7 @@
         <a href="gallery.html">활동사진</a>
         <a href="dojangs.html">소속도장</a>
         <a href="contact.html" class="active">문의</a>
+        <a href="#" class="nav-insta-link" target="_blank" rel="noopener noreferrer" title="Instagram" style="display:inline-flex;align-items:center;padding-top:1px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
       </div>
       <button class="nav-ham" id="nh" aria-label="메뉴">
         <svg width="22" height="14" viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square">
@@ -120,6 +121,7 @@
     <a href="about.html">소개</a><a href="awards.html">수상내역</a>
     <a href="members.html">회원명단</a><a href="gallery.html">활동사진</a>
     <a href="dojangs.html">소속도장</a><a href="contact.html">문의</a>
+    <a href="#" class="nav-insta-link" target="_blank" rel="noopener noreferrer" style="display:flex;gap:.6rem"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram</a>
   </div>
 </header>
 
@@ -143,8 +145,8 @@
     <!-- 입단 문의 -->
     <div class="ct-block rv" style="transition-delay:.1s">
       <div class="ct-tag"><div class="ct-tag-bar"></div><span class="ct-tag-txt">Join</span></div>
-      <h4 class="ct-block-title">입단 문의</h4>
-      <p class="ct-block-desc">지인회에 합류하고 싶으신 분, 태권도 품새를 함께 수련하고 싶으신 분은 편하게 연락 주세요. 현재 도장 소속, 단증 여부 등을 말씀해 주시면 안내해 드립니다.</p>
+      <h4 class="ct-block-title" id="ct-join-title">입단 문의</h4>
+      <p class="ct-block-desc" id="ct-join-desc">지인회에 합류하고 싶으신 분, 태권도 품새를 함께 수련하고 싶으신 분은 편하게 연락 주세요. 현재 도장 소속, 단증 여부 등을 말씀해 주시면 안내해 드립니다.</p>
     </div>
   </div>
 </section>
@@ -156,7 +158,8 @@
         <p class="ft-brand">志人會</p>
         <p class="ft-tagline">전북특별자치도 태권도 품새팀</p>
         <p class="ft-contact">문의 · <a href="tel:0507-1448-7577">0507-1448-7577</a></p>
-              </div>
+        <a href="#" target="_blank" rel="noopener noreferrer" class="ft-insta-link" style="display:inline-flex;align-items:center;gap:.45rem;margin-top:.8rem;color:rgba(248,247,243,.55);font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(248,247,243,.55)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>Instagram</a>
+      </div>
       <div class="ft-right">
         <span class="ft-nav-label">Navigation</span>
         <nav class="ft-nav">
@@ -182,7 +185,7 @@
   try {
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const { data } = await sb.from('settings').select('key,value')
-      .in('key', ['contact_phone','contact_org']);
+      .in('key', ['contact_phone','contact_org','contact_join_title','contact_join_desc']);
     if (!data) return;
     const s = {};
     data.forEach(r => { s[r.key] = r.value; });
@@ -193,6 +196,12 @@
     }
     if (s.contact_org) {
       document.getElementById('ct-org').textContent = s.contact_org + ' · 전북특별자치도 태권도 품새팀';
+    }
+    if (s.contact_join_title) {
+      document.getElementById('ct-join-title').textContent = s.contact_join_title;
+    }
+    if (s.contact_join_desc) {
+      document.getElementById('ct-join-desc').textContent = s.contact_join_desc;
     }
   } catch(_) {}
 })();
